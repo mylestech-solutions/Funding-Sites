@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedZen Health Funding Opportunities</title>
+    <title>MedZen Health Pan-African Funding Opportunities</title>
     <style>
         * {
             margin: 0;
@@ -70,6 +70,22 @@
             position: relative;
             z-index: 1;
             font-weight: 600;
+        }
+        
+        .pan-african-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 25px;
+            margin-top: 15px;
+            font-weight: bold;
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
         }
         
         .stats {
@@ -209,6 +225,7 @@
         .tier-5 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; }
         .tier-6 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
         .tier-7 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
+        .tier-pan { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
         
         .funding-amount {
             font-weight: 800;
@@ -271,6 +288,14 @@
             color: white;
         }
         
+        .africa-map {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            font-size: 1.5em;
+        }
+        
         @media print {
             body {
                 background: white;
@@ -302,30 +327,35 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏥 MedZen Health Funding Opportunities Dashboard</h1>
-            <p class="subtitle">Your Roadmap to $10 Million for African Telemedicine Expansion</p>
+            <h1>🌍 MedZen Health Pan-African Funding Dashboard</h1>
+            <p class="subtitle">Your Roadmap to $10 Million for Continental Telemedicine Expansion</p>
+            <div class="pan-african-badge">🚀 Targeting All 54 African Countries</div>
         </div>
         
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-number">100+</div>
-                <div class="stat-label">Funding Opportunities</div>
+                <div class="stat-label">Funding Sources</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">$10M</div>
-                <div class="stat-label">Target Amount</div>
+                <div class="stat-number">$500M+</div>
+                <div class="stat-label">Available Funding</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">7</div>
-                <div class="stat-label">Funding Tiers</div>
+                <div class="stat-number">54</div>
+                <div class="stat-label">African Countries</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">3</div>
-                <div class="stat-label">Target Countries</div>
+                <div class="stat-number">1.4B</div>
+                <div class="stat-label">People to Serve</div>
             </div>
         </div>
         
-        <button class="download-btn" onclick="downloadTable()">📥 Download Funding Table</button>
+        <div class="africa-map">
+            <span>🇨🇲 🇨🇫 🇧🇯 → Starting Markets → 🌍 All Africa</span>
+        </div>
+        
+        <button class="download-btn" onclick="downloadTable()">📥 Download Complete Funding Table</button>
         
         <div class="table-wrapper">
             <table id="fundingTable">
@@ -342,6 +372,38 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- PAN-AFRICAN SPECIFIC OPPORTUNITIES -->
+                    <tr>
+                        <td><span class="tier-badge tier-pan">PAN-AF</span></td>
+                        <td><strong>Africa CDC Digital Health</strong></td>
+                        <td><span class="funding-amount">$100M Fund</span></td>
+                        <td>PPP Grants</td>
+                        <td><span class="timeline">2024-2030</span></td>
+                        <td><span class="priority-high">TOP PRIORITY</span></td>
+                        <td><a href="mailto:digitalhealth@africacdc.org" class="contact-link">digitalhealth@africacdc.org</a></td>
+                        <td>Pan-African telemedicine focus</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-pan">PAN-AF</span></td>
+                        <td><strong>Africa50 Infrastructure</strong></td>
+                        <td><span class="funding-amount">$10M - $100M</span></td>
+                        <td>Infrastructure Investment</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="mailto:info@africa50.com" class="contact-link">info@africa50.com</a></td>
+                        <td>Min 3 countries required</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-pan">PAN-AF</span></td>
+                        <td><strong>Afreximbank Healthcare</strong></td>
+                        <td><span class="funding-amount">Up to $200M</span></td>
+                        <td>Equipment Facility</td>
+                        <td><span class="timeline">7-year loans</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="https://www.afreximbank.com/" class="contact-link" target="_blank">afreximbank.com</a></td>
+                        <td>All 54 AU states eligible</td>
+                    </tr>
+                    
                     <!-- Tier 1: Immediate High Priority -->
                     <tr>
                         <td><span class="tier-badge tier-1">Tier 1</span></td>
@@ -351,7 +413,7 @@
                         <td><span class="timeline">Rolling 2024-2025</span></td>
                         <td><span class="priority-high">TOP PRIORITY</span></td>
                         <td><a href="https://www.unicef.org/innovation/venturefund/call-for-health-solutions" class="contact-link" target="_blank">Apply Here</a></td>
-                        <td>Open-source commitment, for-profit eligible</td>
+                        <td>All 54 African countries eligible</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-1">Tier 1</span></td>
@@ -361,39 +423,79 @@
                         <td><span class="timeline">Rolling</span></td>
                         <td><span class="priority-high">HIGH</span></td>
                         <td><a href="https://divportal.usaid.gov/s/apply" class="contact-link" target="_blank">DIV Portal</a></td>
-                        <td>Evidence-based, scalable solution</td>
+                        <td>Pan-African = higher funding</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>Gates Foundation i3</strong></td>
-                        <td><span class="funding-amount">$50,000</span></td>
-                        <td>Grant</td>
+                        <td><strong>Gates Foundation Grand Challenges</strong></td>
+                        <td><span class="funding-amount">$100K → $1M</span></td>
+                        <td>Innovation Grant</td>
+                        <td><span class="timeline">Biannual</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="https://gcgh.grandchallenges.org/grants" class="contact-link" target="_blank">Apply Here</a></td>
+                        <td>Continental solutions priority</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-1">Tier 1</span></td>
+                        <td><strong>Gates Foundation i3 Program</strong></td>
+                        <td><span class="funding-amount">$50K → $5M</span></td>
+                        <td>Scale-up Grant</td>
                         <td><span class="timeline">Annual</span></td>
                         <td><span class="priority-high">HIGH</span></td>
-                        <td>Via Partner Orgs</td>
-                        <td>African healthcare focus</td>
+                        <td><a href="https://www.gatesfoundation.org/about/how-we-work/quick-links/grants-database" class="contact-link" target="_blank">Gates Portal</a></td>
+                        <td>21+ African countries funded</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>Grand Challenges Canada</strong></td>
-                        <td><span class="funding-amount">CAD $250,000</span></td>
-                        <td>Proof of Concept</td>
+                        <td><strong>Grand Challenges Africa</strong></td>
+                        <td><span class="funding-amount">$100K seed</span></td>
+                        <td>Innovation Grant</td>
                         <td><span class="timeline">April 24, 2025</span></td>
                         <td><span class="priority-high">URGENT</span></td>
                         <td><a href="https://www.grandchallenges.ca/funding-opportunities/" class="contact-link" target="_blank">Fluxx Portal</a></td>
-                        <td>Global health innovation</td>
+                        <td>African Academy of Sciences</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-1">Tier 1</span></td>
+                        <td><strong>Google Black Founders Fund</strong></td>
+                        <td><span class="funding-amount">$100K + $200K credits</span></td>
+                        <td>Equity-Free</td>
+                        <td><span class="timeline">Q2 2025</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="https://startup.google.com/blackfoundersfund-africa/" class="contact-link" target="_blank">Apply Here</a></td>
+                        <td>All African countries eligible</td>
                     </tr>
                     
-                    <!-- Tier 2: Impact Investors -->
+                    <!-- Tier 2: Pan-African VCs -->
+                    <tr>
+                        <td><span class="tier-badge tier-2">Tier 2</span></td>
+                        <td><strong>Partech Africa</strong></td>
+                        <td><span class="funding-amount">$500K - $5M</span></td>
+                        <td>Equity (Seed-Series B)</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td><span class="priority-high">TOP VC</span></td>
+                        <td><a href="https://partechpartners.com/contact" class="contact-link" target="_blank">Contact Tidjane Deme</a></td>
+                        <td>$143M fund, 20+ countries</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-2">Tier 2</span></td>
+                        <td><strong>TLcom Capital</strong></td>
+                        <td><span class="funding-amount">$500K - $15M</span></td>
+                        <td>Equity</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="mailto:hello@tlcomcapital.com" class="contact-link">hello@tlcomcapital.com</a></td>
+                        <td>$154M TIDE Africa Fund II</td>
+                    </tr>
                     <tr>
                         <td><span class="tier-badge tier-2">Tier 2</span></td>
                         <td><strong>Bamboo Capital Partners</strong></td>
-                        <td><span class="funding-amount">$1M - $10M</span></td>
+                        <td><span class="funding-amount">$500K - $10M</span></td>
                         <td>Equity/Debt</td>
                         <td><span class="timeline">Ongoing</span></td>
                         <td>High</td>
                         <td><a href="mailto:jean-philippe@bamboocp.com" class="contact-link">jean-philippe@bamboocp.com</a></td>
-                        <td>Healthcare portfolio focus</td>
+                        <td>30+ African countries portfolio</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-2">Tier 2</span></td>
@@ -403,7 +505,7 @@
                         <td><span class="timeline">7-12 years</span></td>
                         <td>High</td>
                         <td><a href="https://acumen.org/" class="contact-link" target="_blank">acumen.org</a></td>
-                        <td>Social impact, West Africa office</td>
+                        <td>20+ African countries</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-2">Tier 2</span></td>
@@ -413,7 +515,7 @@
                         <td><span class="timeline">Ongoing</span></td>
                         <td>Medium</td>
                         <td><a href="https://www.4dxventures.com/" class="contact-link" target="_blank">4dxventures.com</a></td>
-                        <td>Pan-African tech focus</td>
+                        <td>$60M Fund II, mPharma in 9 countries</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-2">Tier 2</span></td>
@@ -423,49 +525,59 @@
                         <td><span class="timeline">Ongoing</span></td>
                         <td>Medium</td>
                         <td><a href="https://www.novastarventures.com/" class="contact-link" target="_blank">novastarventures.com</a></td>
-                        <td>East/West Africa presence</td>
+                        <td>$200M Africa People+Planet Fund</td>
                     </tr>
                     
                     <!-- Tier 3: Development Finance -->
                     <tr>
                         <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>IFC AMEF</strong></td>
-                        <td><span class="funding-amount">$5K - $2M</span></td>
-                        <td>Loans (3-7 years)</td>
-                        <td><span class="timeline">Rolling</span></td>
-                        <td>High</td>
-                        <td><a href="mailto:amef@ifc.org" class="contact-link">amef@ifc.org</a></td>
-                        <td>Medical equipment focus</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>AfDB Health Initiative</strong></td>
-                        <td><span class="funding-amount">$500K - $10M</span></td>
-                        <td>Loans/Grants</td>
-                        <td><span class="timeline">Project-based</span></td>
-                        <td>Medium</td>
-                        <td><a href="mailto:bomilola@afdb.org" class="contact-link">bomilola@afdb.org</a></td>
+                        <td><strong>World Bank DE4A</strong></td>
+                        <td><span class="funding-amount">$25B by 2030</span></td>
+                        <td>Digital Economy Fund</td>
+                        <td><span class="timeline">2024-2030</span></td>
+                        <td><span class="priority-high">MAJOR</span></td>
+                        <td><a href="https://www.worldbank.org/en/programs/all-africa-digital-transformation" class="contact-link" target="_blank">Contact Ousmane Diagana</a></td>
                         <td>Digital health infrastructure</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>EU Global Gateway</strong></td>
+                        <td><span class="funding-amount">€10B Health</span></td>
+                        <td>Investment Package</td>
+                        <td><span class="timeline">2021-2027</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="https://international-partnerships.ec.europa.eu/policies/global-gateway_en" class="contact-link" target="_blank">EU Delegations</a></td>
+                        <td>€150B total for Africa</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>IFC Digital Health</strong></td>
+                        <td><span class="funding-amount">$5K - $10M</span></td>
+                        <td>Loans/Equity</td>
+                        <td><span class="timeline">Rolling</span></td>
+                        <td>High</td>
+                        <td><a href="mailto:amef@ifc.org" class="contact-link">amef@ifc.org</a></td>
+                        <td>All African countries</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>AfDB Health Initiative</strong></td>
+                        <td><span class="funding-amount">$3B over 10 years</span></td>
+                        <td>Loans/Grants</td>
+                        <td><span class="timeline">2024-2034</span></td>
+                        <td>High</td>
+                        <td><a href="mailto:bomilola@afdb.org" class="contact-link">bomilola@afdb.org</a></td>
+                        <td>Africa Investment Forum access</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
                         <td><strong>Proparco Transform Health</strong></td>
-                        <td><span class="funding-amount">$1M - $5M</span></td>
+                        <td><span class="funding-amount">$111M Fund</span></td>
                         <td>Blended Finance</td>
                         <td><span class="timeline">Ongoing</span></td>
                         <td>High</td>
                         <td><a href="https://www.proparco.fr/en" class="contact-link" target="_blank">proparco.fr</a></td>
-                        <td>Francophone Africa priority</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>DFC Health Initiative</strong></td>
-                        <td><span class="funding-amount">$1M - $10M</span></td>
-                        <td>Loans/Equity</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>Medium</td>
-                        <td>Vibhuti Jain (Africa Director)</td>
-                        <td>US nexus preferred</td>
+                        <td>40+ African countries</td>
                     </tr>
                     
                     <!-- Tier 4: Government Grants -->
@@ -477,49 +589,39 @@
                         <td><span class="timeline">Rolling</span></td>
                         <td>High</td>
                         <td><a href="https://fundinnovation.dev/en/application-form-step-0/" class="contact-link" target="_blank">Apply Here</a></td>
-                        <td>19 priority African countries</td>
+                        <td>All 54 African countries</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-4">Tier 4</span></td>
-                        <td><strong>UK FCDO</strong></td>
-                        <td><span class="funding-amount">Up to £25M</span></td>
-                        <td>Grant (5 years)</td>
-                        <td><span class="timeline">Annual calls</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://www.gov.uk/international-development-funding" class="contact-link" target="_blank">gov.uk</a></td>
-                        <td>Global health challenge</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-4">Tier 4</span></td>
-                        <td><strong>German GIZ</strong></td>
-                        <td><span class="funding-amount">€50K - €200K</span></td>
-                        <td>Partnership Grant</td>
-                        <td><span class="timeline">Biannual</span></td>
-                        <td>Low</td>
-                        <td><a href="https://www.giz.de/en/html/index.html" class="contact-link" target="_blank">giz.de</a></td>
-                        <td>Hospital partnerships</td>
+                        <td><strong>AUDA-NEPAD</strong></td>
+                        <td><span class="funding-amount">$500K - $5M</span></td>
+                        <td>AU Grants</td>
+                        <td><span class="timeline">Project-based</span></td>
+                        <td>High</td>
+                        <td><a href="https://www.nepad.org/" class="contact-link" target="_blank">nepad.org</a></td>
+                        <td>Cross-border solutions</td>
                     </tr>
                     
                     <!-- Tier 5: Corporate Programs -->
                     <tr>
                         <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>Villgro Africa HTHA</strong></td>
-                        <td><span class="funding-amount">Grants + $1M access</span></td>
-                        <td>Accelerator</td>
-                        <td><span class="timeline">8-10 months</span></td>
+                        <td><strong>Mastercard Foundation</strong></td>
+                        <td><span class="funding-amount">$200M Health Tech</span></td>
+                        <td>Young Africa Works</td>
+                        <td><span class="timeline">2024-2030</span></td>
                         <td>High</td>
-                        <td><a href="mailto:medtech@villgroafrica.org" class="contact-link">medtech@villgroafrica.org</a></td>
-                        <td>Healthcare specialist</td>
+                        <td><a href="mailto:info@mastercardfdn.org" class="contact-link">info@mastercardfdn.org</a></td>
+                        <td>35+ African countries, job creation</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>J&J Innovation Challenge</strong></td>
-                        <td><span class="funding-amount">$50,000</span></td>
-                        <td>Competition</td>
-                        <td><span class="timeline">Annual</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://jnjinnovation.com/africachallenge" class="contact-link" target="_blank">Apply Here</a></td>
-                        <td>39 African countries</td>
+                        <td><strong>Orange Digital Centers</strong></td>
+                        <td><span class="funding-amount">€50K - €500K</span></td>
+                        <td>Accelerator + Investment</td>
+                        <td><span class="timeline">Cohort-based</span></td>
+                        <td>High</td>
+                        <td><a href="https://ventures.orange.com" class="contact-link" target="_blank">ventures.orange.com</a></td>
+                        <td>17 African countries, expanding to 32</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-5">Tier 5</span></td>
@@ -529,20 +631,30 @@
                         <td><span class="timeline">Quarterly</span></td>
                         <td>Medium</td>
                         <td><a href="https://microsoft.com/en-us/ai/ai-for-health" class="contact-link" target="_blank">microsoft.com</a></td>
-                        <td>80% to African orgs</td>
+                        <td>Africa-led projects priority</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>Orange Digital Centers</strong></td>
-                        <td><span class="funding-amount">€50K co-investment</span></td>
-                        <td>Accelerator + Investment</td>
-                        <td><span class="timeline">Cohort-based</span></td>
-                        <td>High</td>
-                        <td><a href="https://ventures.orange.com" class="contact-link" target="_blank">ventures.orange.com</a></td>
-                        <td>Present in Cameroon</td>
+                        <td><strong>J&J Africa Innovation</strong></td>
+                        <td><span class="funding-amount">$50,000</span></td>
+                        <td>Competition</td>
+                        <td><span class="timeline">Annual</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://jnjinnovation.com/jlabs/locations/africa" class="contact-link" target="_blank">J&J Innovation</a></td>
+                        <td>All African countries eligible</td>
                     </tr>
                     
-                    <!-- Tier 6: Strategic NGO Partnerships -->
+                    <!-- Tier 6: Strategic Partnerships -->
+                    <tr>
+                        <td><span class="tier-badge tier-6">Tier 6</span></td>
+                        <td><strong>Amref Health Africa</strong></td>
+                        <td><span class="funding-amount">Up to $2M</span></td>
+                        <td>Co-investment</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>High</td>
+                        <td><a href="https://amref.org" class="contact-link" target="_blank">amref.org</a></td>
+                        <td>Largest African health NGO</td>
+                    </tr>
                     <tr>
                         <td><span class="tier-badge tier-6">Tier 6</span></td>
                         <td><strong>PATH Digital Square</strong></td>
@@ -555,84 +667,97 @@
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>MSF Telemedicine Hub</strong></td>
-                        <td><span class="funding-amount">Partnership</span></td>
-                        <td>Network Access</td>
+                        <td><strong>CHAI Digital Health</strong></td>
+                        <td><span class="funding-amount">$50M Fund</span></td>
+                        <td>Partnership + Funding</td>
+                        <td><span class="timeline">2024-2027</span></td>
+                        <td>High</td>
+                        <td><a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">clintonhealthaccess.org</a></td>
+                        <td>28 African countries</td>
+                    </tr>
+                    
+                    <!-- Pan-African Accelerators -->
+                    <tr>
+                        <td><span class="tier-badge tier-5">Tier 5</span></td>
+                        <td><strong>MEST Africa</strong></td>
+                        <td><span class="funding-amount">$100K investment</span></td>
+                        <td>Accelerator + Seed</td>
+                        <td><span class="timeline">12 months</span></td>
+                        <td>High</td>
+                        <td><a href="https://meltwater.org/" class="contact-link" target="_blank">meltwater.org</a></td>
+                        <td>Ghana, Nigeria, Kenya, SA, Senegal</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-5">Tier 5</span></td>
+                        <td><strong>Norrsken House</strong></td>
+                        <td><span class="funding-amount">Access to $200M+</span></td>
+                        <td>Hub + Network</td>
                         <td><span class="timeline">Ongoing</span></td>
                         <td>High</td>
-                        <td><a href="https://telemedhub.org" class="contact-link" target="_blank">telemedhub.org</a></td>
-                        <td>Active in target regions</td>
+                        <td><a href="https://www.norrskenhouse.org/" class="contact-link" target="_blank">Kigali & Lagos</a></td>
+                        <td>East & West Africa hubs</td>
                     </tr>
+                    
+                    <!-- Mobile Network Partnerships -->
                     <tr>
                         <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>CHAI</strong></td>
-                        <td><span class="funding-amount">Technical Support</span></td>
+                        <td><strong>MTN Ambition 2025</strong></td>
+                        <td><span class="funding-amount">$1B Digital Services</span></td>
                         <td>Partnership</td>
-                        <td><span class="timeline">Project-based</span></td>
+                        <td><span class="timeline">2021-2025</span></td>
                         <td>Medium</td>
-                        <td><a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">clintonhealthaccess.org</a></td>
-                        <td>20+ African countries</td>
+                        <td><a href="https://www.mtn.com/innovation/" class="contact-link" target="_blank">mtn.com</a></td>
+                        <td>19 African markets</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>Amref Health Africa</strong></td>
-                        <td><span class="funding-amount">Varies</span></td>
-                        <td>Partnership + Grants</td>
+                        <td><strong>Safaricom M-TIBA</strong></td>
+                        <td><span class="funding-amount">Partnership</span></td>
+                        <td>Health Wallet Integration</td>
                         <td><span class="timeline">Ongoing</span></td>
                         <td>Medium</td>
-                        <td><a href="https://amref.org" class="contact-link" target="_blank">amref.org</a></td>
-                        <td>35+ African countries</td>
+                        <td><a href="https://www.safaricom.co.ke/" class="contact-link" target="_blank">safaricom.co.ke</a></td>
+                        <td>East Africa expansion</td>
                     </tr>
                     
                     <!-- Tier 7: Crowdfunding -->
                     <tr>
                         <td><span class="tier-badge tier-7">Tier 7</span></td>
-                        <td><strong>Watsi</strong></td>
-                        <td><span class="funding-amount">$10K - $500K</span></td>
-                        <td>Donation Crowdfunding</td>
+                        <td><strong>M-Changa</strong></td>
+                        <td><span class="funding-amount">$1K - $500K</span></td>
+                        <td>Mobile Money Crowdfunding</td>
                         <td><span class="timeline">Campaign-based</span></td>
-                        <td>Low</td>
-                        <td><a href="mailto:connect@watsi.org" class="contact-link">connect@watsi.org</a></td>
-                        <td>100% pass-through</td>
+                        <td>Medium</td>
+                        <td><a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a></td>
+                        <td>Kenya, Uganda, Tanzania, Rwanda, Ghana, Nigeria</td>
                     </tr>
                     <tr>
                         <td><span class="tier-badge tier-7">Tier 7</span></td>
                         <td><strong>GlobalGiving</strong></td>
                         <td><span class="funding-amount">$1K - $1M+</span></td>
-                        <td>Donation Platform</td>
+                        <td>Global Platform</td>
                         <td><span class="timeline">Ongoing</span></td>
                         <td>Low</td>
                         <td><a href="https://globalgiving.org" class="contact-link" target="_blank">globalgiving.org</a></td>
-                        <td>5-12% fees</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-7">Tier 7</span></td>
-                        <td><strong>M-Changa</strong></td>
-                        <td><span class="funding-amount">$1K - $100K</span></td>
-                        <td>Mobile Money Crowdfunding</td>
-                        <td><span class="timeline">Campaign-based</span></td>
-                        <td>Low</td>
-                        <td><a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a></td>
-                        <td>M-Pesa integration</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-7">Tier 7</span></td>
-                        <td><strong>Republic</strong></td>
-                        <td><span class="funding-amount">Up to $5M</span></td>
-                        <td>Equity Crowdfunding</td>
-                        <td><span class="timeline">3-6 months</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://republic.co" class="contact-link" target="_blank">republic.co</a></td>
-                        <td>89% success rate</td>
+                        <td>175+ countries coverage</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div class="footer">
-            <h3>📊 Your Path to $10 Million</h3>
-            <p>Year 1: $500K-1M (Grants) | Year 2-3: $2-4M (Series A) | Year 4-5: $5-7M (Growth)</p>
-            <p style="margin-top: 10px; opacity: 0.9;">Target Countries: Cameroon 🇨🇲 | Central African Republic 🇨🇫 | Benin 🇧🇯</p>
+            <h3>🚀 Your Pan-African Path to $10 Million+</h3>
+            <p><strong>Year 1:</strong> $1-2M (Grants + Seed) | <strong>Year 2:</strong> $3-4M (Series A + Scale Grants)</p>
+            <p><strong>Year 3-4:</strong> $5-6M (DFI + Continental Expansion) | <strong>Year 5:</strong> $10M+ (Series B)</p>
+            <p style="margin-top: 15px; font-size: 1.2em;">
+                <strong>Market Opportunity:</strong> 1.4B people • $259B healthcare market • 90% access gap
+            </p>
+            <p style="margin-top: 10px; opacity: 0.9;">
+                <strong>Starting Markets:</strong> Cameroon 🇨🇲 → Central Africa → West Africa → All 54 Countries 🌍
+            </p>
+            <p style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
+                <strong>Total Accessible Funding Pool: $500M+ across all sources</strong>
+            </p>
         </div>
     </div>
     
@@ -672,7 +797,7 @@
             const url = URL.createObjectURL(blob);
             
             link.setAttribute('href', url);
-            link.setAttribute('download', 'MedZen_Health_Funding_Opportunities.csv');
+            link.setAttribute('download', 'MedZen_Health_PanAfrican_Funding_Opportunities.csv');
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
@@ -701,7 +826,7 @@
                     row.style.transition = 'all 0.5s ease';
                     row.style.opacity = '1';
                     row.style.transform = 'translateY(0)';
-                }, index * 50);
+                }, index * 30);
             });
         });
         

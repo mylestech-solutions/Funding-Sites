@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedZen Health Funding Opportunities</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+            font-size: 18px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%);
+            border-radius: 15px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+            font-weight: 800;
+        }
+        
+        .subtitle {
+            font-size: 1.6em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+            font-weight: 600;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 10px;
+            min-width: 200px;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .stat-label {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+        
+        .download-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(245,87,108,0.4);
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245,87,108,0.5);
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 20px 18px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 1.15em;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        th:first-child {
+            border-top-left-radius: 15px;
+        }
+        
+        th:last-child {
+            border-top-right-radius: 15px;
+        }
+        
+        tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(102,126,234,0.08) 0%, rgba(118,75,162,0.08) 100%);
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        td {
+            padding: 18px 16px;
+            font-size: 1.05em;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        td strong {
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+        
+        .tier-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .tier-1 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .tier-2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .tier-3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+        .tier-4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+        .tier-5 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; }
+        .tier-6 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .tier-7 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
+        
+        .funding-amount {
+            font-weight: 800;
+            color: #2ecc71;
+            font-size: 1.25em;
+            text-shadow: 1px 1px 2px rgba(46,204,113,0.2);
+        }
+        
+        .timeline {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            font-size: 1em;
+            font-weight: 600;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(252,182,159,0.3);
+        }
+        
+        .contact-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 1.05em;
+        }
+        
+        .contact-link:hover {
+            background: rgba(102,126,234,0.15);
+            color: #764ba2;
+            transform: scale(1.05);
+        }
+        
+        .priority-high {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            font-weight: 800;
+            animation: blink 2s infinite;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 10px rgba(255,107,107,0.4);
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 10px;
+            }
+            .download-btn {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            .stat-card {
+                min-width: 100%;
+            }
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 MedZen Health Funding Opportunities Dashboard</h1>
+            <p class="subtitle">Your Roadmap to $10 Million for African Telemedicine Expansion</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">100+</div>
+                <div class="stat-label">Funding Opportunities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">$10M</div>
+                <div class="stat-label">Target Amount</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Funding Tiers</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Target Countries</div>
+            </div>
+        </div>
+        
+        <button class="download-btn" onclick="downloadTable()">📥 Download Funding Table</button>
+        
+        <div class="table-wrapper">
+            <table id="fundingTable">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Organization</th>
+                        <th>Funding Amount</th>
+                        <th>Type</th>
+                        <th>Timeline</th>
+                        <th>Priority</th>
+                        <th>Contact / Apply</th>
+                        <th>Key Requirements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Tier 1: Immediate High Priority -->
+                    <tr>
+                        <td><span class="tier-badge tier-1">Tier 1</span></td>
+                        <td><strong>UNICEF Innovation Fund</strong></td>
+                        <td><span class="funding-amount">$100,000</span></td>
+                        <td>Equity-Free Grant</td>
+                        <td><span class="timeline">Rolling 2024-2025</span></td>
+                        <td><span class="priority-high">TOP PRIORITY</span></td>
+                        <td><a href="https://www.unicef.org/innovation/venturefund/call-for-health-solutions" class="contact-link" target="_blank">Apply Here</a></td>
+                        <td>Open-source commitment, for-profit eligible</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-1">Tier 1</span></td>
+                        <td><strong>USAID DIV</strong></td>
+                        <td><span class="funding-amount">$200K → $5M</span></td>
+                        <td>Tiered Grant</td>
+                        <td><span class="timeline">Rolling</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td><a href="https://divportal.usaid.gov/s/apply" class="contact-link" target="_blank">DIV Portal</a></td>
+                        <td>Evidence-based, scalable solution</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-1">Tier 1</span></td>
+                        <td><strong>Gates Foundation i3</strong></td>
+                        <td><span class="funding-amount">$50,000</span></td>
+                        <td>Grant</td>
+                        <td><span class="timeline">Annual</span></td>
+                        <td><span class="priority-high">HIGH</span></td>
+                        <td>Via Partner Orgs</td>
+                        <td>African healthcare focus</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-1">Tier 1</span></td>
+                        <td><strong>Grand Challenges Canada</strong></td>
+                        <td><span class="funding-amount">CAD $250,000</span></td>
+                        <td>Proof of Concept</td>
+                        <td><span class="timeline">April 24, 2025</span></td>
+                        <td><span class="priority-high">URGENT</span></td>
+                        <td><a href="https://www.grandchallenges.ca/funding-opportunities/" class="contact-link" target="_blank">Fluxx Portal</a></td>
+                        <td>Global health innovation</td>
+                    </tr>
+                    
+                    <!-- Tier 2: Impact Investors -->
+                    <tr>
+                        <td><span class="tier-badge tier-2">Tier 2</span></td>
+                        <td><strong>Bamboo Capital Partners</strong></td>
+                        <td><span class="funding-amount">$1M - $10M</span></td>
+                        <td>Equity/Debt</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>High</td>
+                        <td><a href="mailto:jean-philippe@bamboocp.com" class="contact-link">jean-philippe@bamboocp.com</a></td>
+                        <td>Healthcare portfolio focus</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-2">Tier 2</span></td>
+                        <td><strong>Acumen</strong></td>
+                        <td><span class="funding-amount">$100K - $3M</span></td>
+                        <td>Patient Capital</td>
+                        <td><span class="timeline">7-12 years</span></td>
+                        <td>High</td>
+                        <td><a href="https://acumen.org/" class="contact-link" target="_blank">acumen.org</a></td>
+                        <td>Social impact, West Africa office</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-2">Tier 2</span></td>
+                        <td><strong>4DX Ventures</strong></td>
+                        <td><span class="funding-amount">$500K - $5M</span></td>
+                        <td>Equity</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://www.4dxventures.com/" class="contact-link" target="_blank">4dxventures.com</a></td>
+                        <td>Pan-African tech focus</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-2">Tier 2</span></td>
+                        <td><strong>Novastar Ventures</strong></td>
+                        <td><span class="funding-amount">$1M - $15M</span></td>
+                        <td>Equity</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://www.novastarventures.com/" class="contact-link" target="_blank">novastarventures.com</a></td>
+                        <td>East/West Africa presence</td>
+                    </tr>
+                    
+                    <!-- Tier 3: Development Finance -->
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>IFC AMEF</strong></td>
+                        <td><span class="funding-amount">$5K - $2M</span></td>
+                        <td>Loans (3-7 years)</td>
+                        <td><span class="timeline">Rolling</span></td>
+                        <td>High</td>
+                        <td><a href="mailto:amef@ifc.org" class="contact-link">amef@ifc.org</a></td>
+                        <td>Medical equipment focus</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>AfDB Health Initiative</strong></td>
+                        <td><span class="funding-amount">$500K - $10M</span></td>
+                        <td>Loans/Grants</td>
+                        <td><span class="timeline">Project-based</span></td>
+                        <td>Medium</td>
+                        <td><a href="mailto:bomilola@afdb.org" class="contact-link">bomilola@afdb.org</a></td>
+                        <td>Digital health infrastructure</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>Proparco Transform Health</strong></td>
+                        <td><span class="funding-amount">$1M - $5M</span></td>
+                        <td>Blended Finance</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>High</td>
+                        <td><a href="https://www.proparco.fr/en" class="contact-link" target="_blank">proparco.fr</a></td>
+                        <td>Francophone Africa priority</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-3">Tier 3</span></td>
+                        <td><strong>DFC Health Initiative</strong></td>
+                        <td><span class="funding-amount">$1M - $10M</span></td>
+                        <td>Loans/Equity</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>Medium</td>
+                        <td>Vibhuti Jain (Africa Director)</td>
+                        <td>US nexus preferred</td>
+                    </tr>
+                    
+                    <!-- Tier 4: Government Grants -->
+                    <tr>
+                        <td><span class="tier-badge tier-4">Tier 4</span></td>
+                        <td><strong>AFD Fund for Innovation</strong></td>
+                        <td><span class="funding-amount">€100K - €3M</span></td>
+                        <td>Grant</td>
+                        <td><span class="timeline">Rolling</span></td>
+                        <td>High</td>
+                        <td><a href="https://fundinnovation.dev/en/application-form-step-0/" class="contact-link" target="_blank">Apply Here</a></td>
+                        <td>19 priority African countries</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-4">Tier 4</span></td>
+                        <td><strong>UK FCDO</strong></td>
+                        <td><span class="funding-amount">Up to £25M</span></td>
+                        <td>Grant (5 years)</td>
+                        <td><span class="timeline">Annual calls</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://www.gov.uk/international-development-funding" class="contact-link" target="_blank">gov.uk</a></td>
+                        <td>Global health challenge</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-4">Tier 4</span></td>
+                        <td><strong>German GIZ</strong></td>
+                        <td><span class="funding-amount">€50K - €200K</span></td>
+                        <td>Partnership Grant</td>
+                        <td><span class="timeline">Biannual</span></td>
+                        <td>Low</td>
+                        <td><a href="https://www.giz.de/en/html/index.html" class="contact-link" target="_blank">giz.de</a></td>
+                        <td>Hospital partnerships</td>
+                    </tr>
+                    
+                    <!-- Tier 5: Corporate Programs -->
+                    <tr>
+                        <td><span class="tier-badge tier-5">Tier 5</span></td>
+                        <td><strong>Villgro Africa HTHA</strong></td>
+                        <td><span class="funding-amount">Grants + $1M access</span></td>
+                        <td>Accelerator</td>
+                        <td><span class="timeline">8-10 months</span></td>
+                        <td>High</td>
+                        <td><a href="mailto:medtech@villgroafrica.org" class="contact-link">medtech@villgroafrica.org</a></td>
+                        <td>Healthcare specialist</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-5">Tier 5</span></td>
+                        <td><strong>J&J Innovation Challenge</strong></td>
+                        <td><span class="funding-amount">$50,000</span></td>
+                        <td>Competition</td>
+                        <td><span class="timeline">Annual</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://jnjinnovation.com/africachallenge" class="contact-link" target="_blank">Apply Here</a></td>
+                        <td>39 African countries</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-5">Tier 5</span></td>
+                        <td><strong>Microsoft AI for Health</strong></td>
+                        <td><span class="funding-amount">$10K - $100K</span></td>
+                        <td>Azure Credits + Grant</td>
+                        <td><span class="timeline">Quarterly</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://microsoft.com/en-us/ai/ai-for-health" class="contact-link" target="_blank">microsoft.com</a></td>
+                        <td>80% to African orgs</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-5">Tier 5</span></td>
+                        <td><strong>Orange Digital Centers</strong></td>
+                        <td><span class="funding-amount">€50K co-investment</span></td>
+                        <td>Accelerator + Investment</td>
+                        <td><span class="timeline">Cohort-based</span></td>
+                        <td>High</td>
+                        <td><a href="https://ventures.orange.com" class="contact-link" target="_blank">ventures.orange.com</a></td>
+                        <td>Present in Cameroon</td>
+                    </tr>
+                    
+                    <!-- Tier 6: Strategic NGO Partnerships -->
+                    <tr>
+                        <td><span class="tier-badge tier-6">Tier 6</span></td>
+                        <td><strong>PATH Digital Square</strong></td>
+                        <td><span class="funding-amount">$15M+ initiative</span></td>
+                        <td>Technical Partnership</td>
+                        <td><span class="timeline">Multi-year</span></td>
+                        <td>High</td>
+                        <td><a href="https://www.path.org" class="contact-link" target="_blank">path.org</a></td>
+                        <td>Government integration</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-6">Tier 6</span></td>
+                        <td><strong>MSF Telemedicine Hub</strong></td>
+                        <td><span class="funding-amount">Partnership</span></td>
+                        <td>Network Access</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>High</td>
+                        <td><a href="https://telemedhub.org" class="contact-link" target="_blank">telemedhub.org</a></td>
+                        <td>Active in target regions</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-6">Tier 6</span></td>
+                        <td><strong>CHAI</strong></td>
+                        <td><span class="funding-amount">Technical Support</span></td>
+                        <td>Partnership</td>
+                        <td><span class="timeline">Project-based</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">clintonhealthaccess.org</a></td>
+                        <td>20+ African countries</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-6">Tier 6</span></td>
+                        <td><strong>Amref Health Africa</strong></td>
+                        <td><span class="funding-amount">Varies</span></td>
+                        <td>Partnership + Grants</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://amref.org" class="contact-link" target="_blank">amref.org</a></td>
+                        <td>35+ African countries</td>
+                    </tr>
+                    
+                    <!-- Tier 7: Crowdfunding -->
+                    <tr>
+                        <td><span class="tier-badge tier-7">Tier 7</span></td>
+                        <td><strong>Watsi</strong></td>
+                        <td><span class="funding-amount">$10K - $500K</span></td>
+                        <td>Donation Crowdfunding</td>
+                        <td><span class="timeline">Campaign-based</span></td>
+                        <td>Low</td>
+                        <td><a href="mailto:connect@watsi.org" class="contact-link">connect@watsi.org</a></td>
+                        <td>100% pass-through</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-7">Tier 7</span></td>
+                        <td><strong>GlobalGiving</strong></td>
+                        <td><span class="funding-amount">$1K - $1M+</span></td>
+                        <td>Donation Platform</td>
+                        <td><span class="timeline">Ongoing</span></td>
+                        <td>Low</td>
+                        <td><a href="https://globalgiving.org" class="contact-link" target="_blank">globalgiving.org</a></td>
+                        <td>5-12% fees</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-7">Tier 7</span></td>
+                        <td><strong>M-Changa</strong></td>
+                        <td><span class="funding-amount">$1K - $100K</span></td>
+                        <td>Mobile Money Crowdfunding</td>
+                        <td><span class="timeline">Campaign-based</span></td>
+                        <td>Low</td>
+                        <td><a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a></td>
+                        <td>M-Pesa integration</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge tier-7">Tier 7</span></td>
+                        <td><strong>Republic</strong></td>
+                        <td><span class="funding-amount">Up to $5M</span></td>
+                        <td>Equity Crowdfunding</td>
+                        <td><span class="timeline">3-6 months</span></td>
+                        <td>Medium</td>
+                        <td><a href="https://republic.co" class="contact-link" target="_blank">republic.co</a></td>
+                        <td>89% success rate</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="footer">
+            <h3>📊 Your Path to $10 Million</h3>
+            <p>Year 1: $500K-1M (Grants) | Year 2-3: $2-4M (Series A) | Year 4-5: $5-7M (Growth)</p>
+            <p style="margin-top: 10px; opacity: 0.9;">Target Countries: Cameroon 🇨🇲 | Central African Republic 🇨🇫 | Benin 🇧🇯</p>
+        </div>
+    </div>
+    
+    <script>
+        function downloadTable() {
+            // Create CSV content
+            const table = document.getElementById('fundingTable');
+            let csv = [];
+            
+            // Get headers
+            const headers = [];
+            const headerCells = table.querySelectorAll('thead th');
+            headerCells.forEach(cell => {
+                headers.push('"' + cell.textContent.trim() + '"');
+            });
+            csv.push(headers.join(','));
+            
+            // Get data rows
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const rowData = [];
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    // Clean the text content
+                    let text = cell.textContent.trim();
+                    // Remove any commas and quotes for CSV compatibility
+                    text = text.replace(/"/g, '""');
+                    rowData.push('"' + text + '"');
+                });
+                csv.push(rowData.join(','));
+            });
+            
+            // Create blob and download
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'MedZen_Health_Funding_Opportunities.csv');
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            const btn = document.querySelector('.download-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Downloaded Successfully!';
+            btn.style.background = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+            }, 2000);
+        }
+        
+        // Add animation on load
+        window.addEventListener('load', () => {
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    row.style.transition = 'all 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, index * 50);
+            });
+        });
+        
+        // Print functionality
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'p') {
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

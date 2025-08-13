@@ -789,7 +789,6 @@
             <button class="action-btn filter-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="filterByProgress('Submitted')">📨 Show Submitted</button>
             <button class="action-btn filter-btn" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" onclick="filterByProgress('Approved')">🎉 Show Approved</button>
             <button class="action-btn clear-btn" onclick="showAll()">🔄 Show All Grants</button>
-            <button class="action-btn" style="background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);" onclick="forceInitializeDatabase()">🚀 Initialize Database (First Time Only)</button>
         </div>
         
         <div class="table-wrapper">
@@ -846,26 +845,26 @@
             return SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && supabase;
         }
         
-        // Force initialize database (for first-time setup)
-        async function forceInitializeDatabase() {
+        // Initialize grants in Supabase (run once)
+        async function initializeSupabaseData() {
             if (!isSupabaseConfigured()) {
-                showNotification('Supabase not configured!', 'error');
+                console.log('Supabase not configured, using local storage');
                 return;
             }
             
-            const confirmInit = confirm('This will populate the database with all 70+ grants. Continue?');
-            if (!confirmInit) return;
-            
             try {
-                showNotification('Initializing database... Please wait...', 'success');
-                
-                // Clear existing grants first (optional)
-                const { error: deleteError } = await supabase
+                // Check if grants already exist
+                const { data: existingGrants, error: checkError } = await supabase
                     .from('grants')
-                    .delete()
-                    .neq('id', 0); // Delete all
+                    .select('*')
+                    .limit(1);
                 
-                // Prepare grants for insertion
+                if (existingGrants && existingGrants.length > 0) {
+                    console.log('Grants already initialized in Supabase');
+                    return;
+                }
+                
+                // Insert all grants
                 const grantsToInsert = fundingData.map(grant => ({
                     tier: grant.tier,
                     organization: grant.organization,
@@ -877,35 +876,22 @@
                     requirements: grant.requirements
                 }));
                 
-                // Insert in batches of 10 to avoid timeout
-                const batchSize = 10;
-                for (let i = 0; i < grantsToInsert.length; i += batchSize) {
-                    const batch = grantsToInsert.slice(i, i + batchSize);
-                    const { data, error } = await supabase
-                        .from('grants')
-                        .insert(batch);
-                    
-                    if (error) {
-                        console.error('Error inserting batch:', error);
-                        showNotification(`Error inserting grants batch ${i/batchSize + 1}: ${error.message}`, 'error');
-                    } else {
-                        console.log(`Inserted batch ${i/batchSize + 1}`);
-                    }
+                const { data, error } = await supabase
+                    .from('grants')
+                    .insert(grantsToInsert);
+                
+                if (error) {
+                    console.error('Error initializing grants:', error);
+                } else {
+                    console.log('Grants initialized successfully in Supabase');
+                    showNotification('Database initialized with all grants!', 'success');
                 }
-                
-                showNotification(`✅ Successfully initialized ${grantsToInsert.length} grants in database!`, 'success');
-                
-                // Reload data from Supabase
-                await loadFromSupabase();
-                renderTable();
-                
             } catch (err) {
-                console.error('Error initializing database:', err);
-                showNotification('Error initializing database: ' + err.message, 'error');
+                console.error('Error connecting to Supabase:', err);
             }
         }
         
-        // Modified loadFromSupabase to better handle empty database
+        // Load grants from Supabase
         async function loadFromSupabase() {
             if (!isSupabaseConfigured()) {
                 loadAssignments(); // Fall back to local storage
@@ -920,15 +906,7 @@
                 
                 if (error) {
                     console.error('Error loading from Supabase:', error);
-                    showNotification('Database connection error. Using local data.', 'error');
                     loadAssignments(); // Fall back to local storage
-                    return;
-                }
-                
-                // If database is empty but we have local data, show init button
-                if ((!data || data.length === 0) && fundingData.length > 0) {
-                    console.log('Database is empty. Local data available for initialization.');
-                    showNotification('Database is empty. Click "Initialize Database" to populate with grants.', 'error');
                     return;
                 }
                 
@@ -958,8 +936,10 @@
                             }
                         });
                     });
-                    console.log(`Loaded ${data.length} grants from Supabase`);
-                    showNotification(`✅ Connected to cloud - ${data.length} grants loaded`, 'success');
+                    console.log('Loaded grants from Supabase');
+                } else {
+                    // Initialize Supabase with existing data
+                    await initializeSupabaseData();
                 }
             } catch (err) {
                 console.error('Error loading from Supabase:', err);

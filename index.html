@@ -471,6 +471,12 @@
             color: white;
         }
         
+        .progress-select.status-not-available {
+            background: linear-gradient(135deg, #868e96 0%, #495057 100%);
+            color: white;
+            opacity: 0.8;
+        }
+        
         @keyframes pulse-orange {
             0%, 100% { box-shadow: 0 0 10px rgba(252,182,159,0.5); }
             50% { box-shadow: 0 0 20px rgba(252,182,159,0.8); }
@@ -760,6 +766,10 @@
                     <span class="progress-stat-number" id="approvedCount">0</span>
                     <span>Approved</span>
                 </div>
+                <div class="progress-stat" style="background: linear-gradient(135deg, #868e96 0%, #495057 100%); color: white;">
+                    <span class="progress-stat-number" id="notAvailableCount">0</span>
+                    <span>Not Available</span>
+                </div>
             </div>
         </div>
         
@@ -859,35 +869,53 @@
                     .select('*')
                     .limit(1);
                 
+                if (checkError) {
+                    console.error('Error checking grants:', checkError);
+                    return;
+                }
+                
                 if (existingGrants && existingGrants.length > 0) {
                     console.log('Grants already initialized in Supabase');
                     return;
                 }
                 
-                // Insert all grants
+                console.log('Initializing grants in database...');
+                
+                // Insert all grants in batches to avoid timeout
                 const grantsToInsert = fundingData.map(grant => ({
-                    tier: grant.tier,
-                    organization: grant.organization,
-                    amount: grant.amount,
-                    type: grant.type,
-                    timeline: grant.timeline,
-                    priority: grant.priority,
-                    contact: grant.contact,
-                    requirements: grant.requirements
+                    tier: grant.tier || '',
+                    organization: grant.organization || '',
+                    amount: grant.amount || '',
+                    type: grant.type || '',
+                    timeline: grant.timeline || '',
+                    priority: grant.priority || '',
+                    contact: grant.contact || '',
+                    requirements: grant.requirements || ''
                 }));
                 
-                const { data, error } = await supabase
-                    .from('grants')
-                    .insert(grantsToInsert);
-                
-                if (error) {
-                    console.error('Error initializing grants:', error);
-                } else {
-                    console.log('Grants initialized successfully in Supabase');
-                    showNotification('Database initialized with all grants!', 'success');
+                // Insert in batches of 10
+                for (let i = 0; i < grantsToInsert.length; i += 10) {
+                    const batch = grantsToInsert.slice(i, i + 10);
+                    const { data, error } = await supabase
+                        .from('grants')
+                        .insert(batch)
+                        .select();
+                    
+                    if (error) {
+                        console.error(`Error inserting batch ${i/10 + 1}:`, error);
+                    } else {
+                        console.log(`Inserted batch ${i/10 + 1} successfully`);
+                    }
                 }
+                
+                console.log('All grants initialized successfully');
+                showNotification('Database initialized with all grants!', 'success');
+                
+                // Reload data after initialization
+                await loadFromSupabase();
+                renderTable();
             } catch (err) {
-                console.error('Error connecting to Supabase:', err);
+                console.error('Error in initializeSupabaseData:', err);
             }
         }
         
@@ -944,66 +972,6 @@
             } catch (err) {
                 console.error('Error loading from Supabase:', err);
                 loadAssignments(); // Fall back to local storage
-            }
-        }
-        
-        // Save assignment to Supabase
-        async function saveAssignmentToSupabase(grantId, assignedTo) {
-            if (!isSupabaseConfigured()) return false;
-            
-            try {
-                // First delete any existing assignment
-                await supabase
-                    .from('assignments')
-                    .delete()
-                    .eq('grant_id', grantId);
-                
-                // Insert new assignment
-                if (assignedTo) {
-                    const { error } = await supabase
-                        .from('assignments')
-                        .insert({
-                            grant_id: grantId,
-                            assigned_to: assignedTo
-                        });
-                    
-                    if (error) {
-                        console.error('Error saving assignment:', error);
-                        return false;
-                    }
-                }
-                return true;
-            } catch (err) {
-                console.error('Error saving to Supabase:', err);
-                return false;
-            }
-        }
-        
-        // Save progress to Supabase
-        async function saveProgressToSupabase(grantId, status, notes, updatedBy) {
-            if (!isSupabaseConfigured()) return false;
-            
-            try {
-                const { error } = await supabase
-                    .from('progress')
-                    .upsert({
-                        grant_id: grantId,
-                        status: status,
-                        notes: notes,
-                        updated_by: updatedBy,
-                        last_updated: new Date().toISOString()
-                    }, {
-                        onConflict: 'grant_id'
-                    });
-                
-                if (error) {
-                    console.error('Error saving progress:', error);
-                    return false;
-                }
-                return true;
-            } catch (err) {
-                console.error('Error saving progress to Supabase:', err);
-                return false;
             }
         }
         
@@ -1878,6 +1846,7 @@
                                 <option value="Approved" ${grant.progress.status === 'Approved' ? 'selected' : ''}>🎉 Approved</option>
                                 <option value="Rejected" ${grant.progress.status === 'Rejected' ? 'selected' : ''}>❌ Rejected</option>
                                 <option value="Resubmitting" ${grant.progress.status === 'Resubmitting' ? 'selected' : ''}>🔄 Resubmitting</option>
+                                <option value="Not Available" ${grant.progress.status === 'Not Available' ? 'selected' : ''}>🚫 Not Available</option>
                             </select>
                             ${grant.progress.lastUpdated ? 
                                 `<div class="progress-date">Updated: ${new Date(grant.progress.lastUpdated).toLocaleDateString()}</div>` : ''}
@@ -1927,16 +1896,53 @@
             
             // Save to Supabase if configured
             if (isSupabaseConfigured() && grant.id) {
-                const success = await saveAssignmentToSupabase(grant.id, name);
-                if (success) {
-                    showNotification(`Grant assigned to ${name}!`, 'success');
+                try {
+                    // First, create the assignment
+                    const { data: assignData, error: assignError } = await supabase
+                        .from('assignments')
+                        .insert({
+                            grant_id: grant.id,
+                            assigned_to: name,
+                            assigned_date: new Date().toISOString()
+                        })
+                        .select();
+                    
+                    if (assignError) {
+                        console.error('Assignment error:', assignError);
+                        showNotification('Error assigning grant: ' + assignError.message, 'error');
+                        return;
+                    }
+                    
+                    // Then, create initial progress entry
+                    const { data: progressData, error: progressError } = await supabase
+                        .from('progress')
+                        .insert({
+                            grant_id: grant.id,
+                            status: 'Not Started',
+                            notes: '',
+                            updated_by: name,
+                            last_updated: new Date().toISOString()
+                        })
+                        .select();
+                    
+                    if (progressError) {
+                        console.error('Progress error:', progressError);
+                    }
+                    
+                    showNotification(`Grant assigned to ${name} and saved to database!`, 'success');
+                    
+                    // Reload data from database
                     await loadFromSupabase();
                     renderTable();
-                    return;
+                    
+                } catch (err) {
+                    console.error('Error in assignment:', err);
+                    showNotification('Error: ' + err.message, 'error');
                 }
+                return;
             }
             
-            // Fall back to local storage
+            // Fall back to local storage if Supabase not configured
             grant.assigned = {
                 name: name,
                 date: new Date().toISOString()
@@ -1947,7 +1953,7 @@
             showNotification(`Grant assigned to ${name}!`, 'success');
         }
         
-        // Modified unassignGrant function
+        // Modified unassignGrant function - DELETES from database
         async function unassignGrant(index) {
             const grant = fundingData[index];
             const currentUser = document.getElementById('teamMemberName').value.trim();
@@ -1959,19 +1965,51 @@
             }
             
             if (grant.assigned && grant.assigned.name === currentUser) {
-                // Save to Supabase if configured
+                // Delete from Supabase if configured
                 if (isSupabaseConfigured() && grant.id) {
-                    const success = await saveAssignmentToSupabase(grant.id, null);
-                    if (success) {
-                        showNotification('Grant unassigned successfully!', 'success');
+                    try {
+                        // Delete assignment record
+                        const { error: deleteAssignError } = await supabase
+                            .from('assignments')
+                            .delete()
+                            .eq('grant_id', grant.id);
+                        
+                        if (deleteAssignError) {
+                            console.error('Delete assignment error:', deleteAssignError);
+                            showNotification('Error removing assignment: ' + deleteAssignError.message, 'error');
+                            return;
+                        }
+                        
+                        // Delete progress record
+                        const { error: deleteProgressError } = await supabase
+                            .from('progress')
+                            .delete()
+                            .eq('grant_id', grant.id);
+                        
+                        if (deleteProgressError) {
+                            console.error('Delete progress error:', deleteProgressError);
+                        }
+                        
+                        showNotification('Assignment removed from database!', 'success');
+                        
+                        // Reload data from database
                         await loadFromSupabase();
                         renderTable();
-                        return;
+                        
+                    } catch (err) {
+                        console.error('Error removing assignment:', err);
+                        showNotification('Error: ' + err.message, 'error');
                     }
+                    return;
                 }
                 
                 // Fall back to local storage
                 grant.assigned = null;
+                grant.progress = {
+                    status: 'Not Started',
+                    notes: '',
+                    lastUpdated: null
+                };
                 saveAssignments();
                 renderTable();
                 showNotification('Grant unassigned successfully!', 'success');
@@ -1980,7 +2018,7 @@
             }
         }
         
-        // Modified updateProgress function
+        // Modified updateProgress function - UPDATES database immediately
         async function updateProgress(index, status) {
             const currentUser = document.getElementById('teamMemberName').value.trim();
             const grant = fundingData[index];
@@ -1993,20 +2031,70 @@
             }
             
             if (grant.assigned && grant.assigned.name === currentUser) {
-                // Save to Supabase if configured
+                // Update in Supabase if configured
                 if (isSupabaseConfigured() && grant.id) {
-                    const success = await saveProgressToSupabase(
-                        grant.id, 
-                        status, 
-                        grant.progress.notes, 
-                        currentUser
-                    );
-                    if (success) {
-                        showNotification(`Progress updated to: ${status}`, 'success');
-                        await loadFromSupabase();
-                        renderTable();
-                        return;
+                    try {
+                        // Check if progress record exists
+                        const { data: existing, error: checkError } = await supabase
+                            .from('progress')
+                            .select('*')
+                            .eq('grant_id', grant.id)
+                            .single();
+                        
+                        if (existing) {
+                            // Update existing record
+                            const { error: updateError } = await supabase
+                                .from('progress')
+                                .update({
+                                    status: status,
+                                    updated_by: currentUser,
+                                    last_updated: new Date().toISOString()
+                                })
+                                .eq('grant_id', grant.id);
+                            
+                            if (updateError) {
+                                console.error('Update error:', updateError);
+                                showNotification('Error updating progress: ' + updateError.message, 'error');
+                                document.getElementById(`progress-${index}`).value = grant.progress.status;
+                                return;
+                            }
+                        } else {
+                            // Create new progress record
+                            const { error: insertError } = await supabase
+                                .from('progress')
+                                .insert({
+                                    grant_id: grant.id,
+                                    status: status,
+                                    notes: '',
+                                    updated_by: currentUser,
+                                    last_updated: new Date().toISOString()
+                                });
+                            
+                            if (insertError) {
+                                console.error('Insert error:', insertError);
+                                showNotification('Error creating progress: ' + insertError.message, 'error');
+                                document.getElementById(`progress-${index}`).value = grant.progress.status;
+                                return;
+                            }
+                        }
+                        
+                        showNotification(`Progress updated to: ${status} in database!`, 'success');
+                        
+                        // Update local data
+                        grant.progress.status = status;
+                        grant.progress.lastUpdated = new Date().toISOString();
+                        
+                        // Update UI
+                        const selectElement = document.getElementById(`progress-${index}`);
+                        selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+                        updateProgressStats();
+                        
+                    } catch (err) {
+                        console.error('Error updating progress:', err);
+                        showNotification('Error: ' + err.message, 'error');
+                        document.getElementById(`progress-${index}`).value = grant.progress.status;
                     }
+                    return;
                 }
                 
                 // Fall back to local storage
@@ -2025,7 +2113,7 @@
             }
         }
         
-        // Modified saveNotes function
+        // Modified saveNotes function - SAVES to database immediately
         async function saveNotes(index) {
             const currentUser = document.getElementById('teamMemberName').value.trim();
             const grant = fundingData[index];
@@ -2040,18 +2128,60 @@
             if (grant.assigned && grant.assigned.name === currentUser) {
                 // Save to Supabase if configured
                 if (isSupabaseConfigured() && grant.id) {
-                    const success = await saveProgressToSupabase(
-                        grant.id,
-                        grant.progress.status,
-                        notes,
-                        currentUser
-                    );
-                    if (success) {
-                        showNotification('Notes saved successfully!', 'success');
-                        await loadFromSupabase();
-                        renderTable();
-                        return;
+                    try {
+                        // Check if progress record exists
+                        const { data: existing, error: checkError } = await supabase
+                            .from('progress')
+                            .select('*')
+                            .eq('grant_id', grant.id)
+                            .single();
+                        
+                        if (existing) {
+                            // Update existing record
+                            const { error: updateError } = await supabase
+                                .from('progress')
+                                .update({
+                                    notes: notes,
+                                    updated_by: currentUser,
+                                    last_updated: new Date().toISOString()
+                                })
+                                .eq('grant_id', grant.id);
+                            
+                            if (updateError) {
+                                console.error('Update notes error:', updateError);
+                                showNotification('Error saving notes: ' + updateError.message, 'error');
+                                return;
+                            }
+                        } else {
+                            // Create new progress record with notes
+                            const { error: insertError } = await supabase
+                                .from('progress')
+                                .insert({
+                                    grant_id: grant.id,
+                                    status: grant.progress.status || 'Not Started',
+                                    notes: notes,
+                                    updated_by: currentUser,
+                                    last_updated: new Date().toISOString()
+                                });
+                            
+                            if (insertError) {
+                                console.error('Insert notes error:', insertError);
+                                showNotification('Error creating notes: ' + insertError.message, 'error');
+                                return;
+                            }
+                        }
+                        
+                        showNotification('Notes saved to database!', 'success');
+                        
+                        // Update local data
+                        grant.progress.notes = notes;
+                        grant.progress.lastUpdated = new Date().toISOString();
+                        
+                    } catch (err) {
+                        console.error('Error saving notes:', err);
+                        showNotification('Error: ' + err.message, 'error');
                     }
+                    return;
                 }
                 
                 // Fall back to local storage
@@ -2061,6 +2191,48 @@
                 showNotification('Notes saved successfully!', 'success');
             } else {
                 showNotification('You can only update notes for grants assigned to you!', 'error');
+            }
+        }
+        
+        // Add function to mark grant as completed (optional)
+        async function completeGrant(index) {
+            const currentUser = document.getElementById('teamMemberName').value.trim();
+            const grant = fundingData[index];
+            
+            if (!currentUser) {
+                showNotification('Please enter your name first!', 'error');
+                return;
+            }
+            
+            if (grant.assigned && grant.assigned.name === currentUser) {
+                if (isSupabaseConfigured() && grant.id) {
+                    try {
+                        // Update progress to Approved/Completed
+                        const { error } = await supabase
+                            .from('progress')
+                            .update({
+                                status: 'Approved',
+                                updated_by: currentUser,
+                                last_updated: new Date().toISOString()
+                            })
+                            .eq('grant_id', grant.id);
+                        
+                        if (error) {
+                            showNotification('Error completing grant: ' + error.message, 'error');
+                            return;
+                        }
+                        
+                        showNotification('Grant marked as completed!', 'success');
+                        await loadFromSupabase();
+                        renderTable();
+                        
+                    } catch (err) {
+                        console.error('Error completing grant:', err);
+                        showNotification('Error: ' + err.message, 'error');
+                    }
+                }
+            } else {
+                showNotification('You can only complete grants assigned to you!', 'error');
             }
         }
         
@@ -2143,7 +2315,8 @@
                 'Under Review': 0,
                 'Approved': 0,
                 'Rejected': 0,
-                'Resubmitting': 0
+                'Resubmitting': 0,
+                'Not Available': 0
             };
             
             fundingData.forEach(grant => {
@@ -2158,6 +2331,7 @@
             document.getElementById('submittedCount').textContent = statusCounts['Submitted'];
             document.getElementById('underReviewCount').textContent = statusCounts['Under Review'];
             document.getElementById('approvedCount').textContent = statusCounts['Approved'];
+            document.getElementById('notAvailableCount').textContent = statusCounts['Not Available'];
         }
         
         // Filter functions

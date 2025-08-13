@@ -392,6 +392,162 @@
             gap: 8px;
         }
         
+        /* Progress Status Styles */
+        .progress-cell {
+            min-width: 220px;
+        }
+        
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .progress-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .progress-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102,126,234,0.3);
+        }
+        
+        .progress-select.status-not-started {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            color: #666;
+        }
+        
+        .progress-select.status-researching {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+        }
+        
+        .progress-select.status-preparing {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            color: #333;
+        }
+        
+        .progress-select.status-in-progress {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+            animation: pulse-orange 2s infinite;
+        }
+        
+        .progress-select.status-submitted {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .progress-select.status-under-review {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #333;
+        }
+        
+        .progress-select.status-approved {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(67,233,123,0.4);
+        }
+        
+        .progress-select.status-rejected {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            color: white;
+        }
+        
+        .progress-select.status-resubmitting {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        @keyframes pulse-orange {
+            0%, 100% { box-shadow: 0 0 10px rgba(252,182,159,0.5); }
+            50% { box-shadow: 0 0 20px rgba(252,182,159,0.8); }
+        }
+        
+        .progress-info {
+            background: rgba(102,126,234,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+        }
+        
+        .progress-date {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .progress-notes {
+            margin-top: 8px;
+        }
+        
+        .progress-notes-input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+        
+        .progress-notes-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102,126,234,0.2);
+        }
+        
+        .save-notes-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .save-notes-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+        
+        .progress-summary {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .progress-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .progress-stat-number {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
         .assign-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -575,6 +731,32 @@
                     </div>
                 </div>
             </div>
+            <div class="progress-summary">
+                <div class="progress-stat" style="background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);">
+                    <span class="progress-stat-number" id="notStartedCount">0</span>
+                    <span>Not Started</span>
+                </div>
+                <div class="progress-stat" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);">
+                    <span class="progress-stat-number" id="researchingCount">0</span>
+                    <span>Researching</span>
+                </div>
+                <div class="progress-stat" style="background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);">
+                    <span class="progress-stat-number" id="preparingCount">0</span>
+                    <span>Preparing</span>
+                </div>
+                <div class="progress-stat" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <span class="progress-stat-number" id="submittedCount">0</span>
+                    <span>Submitted</span>
+                </div>
+                <div class="progress-stat" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                    <span class="progress-stat-number" id="underReviewCount">0</span>
+                    <span>Under Review</span>
+                </div>
+                <div class="progress-stat" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                    <span class="progress-stat-number" id="approvedCount">0</span>
+                    <span>Approved</span>
+                </div>
+            </div>
         </div>
         
         <div class="stats">
@@ -615,6 +797,7 @@
                         <th>Priority</th>
                         <th>Contact / Apply</th>
                         <th>Assignment Status</th>
+                        <th>Progress Status</th>
                         <th>Key Requirements</th>
                     </tr>
                 </thead>
@@ -650,7 +833,12 @@
                 priority: 'TOP PRIORITY',
                 contact: '<a href="https://africacdc.org" class="contact-link" target="_blank">Website</a> | <a href="mailto:digitalhealth@africacdc.org" class="contact-link">Email</a>',
                 requirements: 'Pan-African telemedicine focus',
-                assigned: null
+                assigned: null,
+                progress: {
+                    status: 'Not Started',
+                    notes: '',
+                    lastUpdated: null
+                }
             },
             {
                 tier: 'PAN-AF',
@@ -1349,6 +1537,8 @@
         // Load assignments from localStorage
         function loadAssignments() {
             const saved = localStorage.getItem('grantAssignments');
+            const savedProgress = localStorage.getItem('grantProgress');
+            
             if (saved) {
                 const assignments = JSON.parse(saved);
                 fundingData.forEach((grant, index) => {
@@ -1357,17 +1547,48 @@
                     }
                 });
             }
+            
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                fundingData.forEach((grant, index) => {
+                    if (progress[index]) {
+                        grant.progress = progress[index];
+                    } else {
+                        grant.progress = {
+                            status: 'Not Started',
+                            notes: '',
+                            lastUpdated: null
+                        };
+                    }
+                });
+            } else {
+                // Initialize progress for all grants
+                fundingData.forEach(grant => {
+                    grant.progress = {
+                        status: 'Not Started',
+                        notes: '',
+                        lastUpdated: null
+                    };
+                });
+            }
         }
         
         // Save assignments to localStorage
         function saveAssignments() {
             const assignments = {};
+            const progress = {};
+            
             fundingData.forEach((grant, index) => {
                 if (grant.assigned) {
                     assignments[index] = grant.assigned;
                 }
+                if (grant.progress) {
+                    progress[index] = grant.progress;
+                }
             });
+            
             localStorage.setItem('grantAssignments', JSON.stringify(assignments));
+            localStorage.setItem('grantProgress', JSON.stringify(progress));
         }
         
         // Get tier badge class
@@ -1395,6 +1616,15 @@
                     row.classList.add('assigned');
                 }
                 
+                // Initialize progress if not exists
+                if (!grant.progress) {
+                    grant.progress = {
+                        status: 'Not Started',
+                        notes: '',
+                        lastUpdated: null
+                    };
+                }
+                
                 row.innerHTML = `
                     <td><span class="tier-badge ${getTierClass(grant.tier)}">Tier ${grant.tier}</span></td>
                     <td><strong>${grant.organization}</strong></td>
@@ -1416,6 +1646,35 @@
                             }
                         </div>
                     </td>
+                    <td class="progress-cell">
+                        <div class="progress-container">
+                            <select class="progress-select status-${grant.progress.status.toLowerCase().replace(/\s+/g, '-')}" 
+                                    id="progress-${index}" 
+                                    onchange="updateProgress(${index}, this.value)"
+                                    ${!grant.assigned ? 'disabled' : ''}>
+                                <option value="Not Started" ${grant.progress.status === 'Not Started' ? 'selected' : ''}>📋 Not Started</option>
+                                <option value="Researching" ${grant.progress.status === 'Researching' ? 'selected' : ''}>🔍 Researching</option>
+                                <option value="Preparing" ${grant.progress.status === 'Preparing' ? 'selected' : ''}>📝 Preparing</option>
+                                <option value="In Progress" ${grant.progress.status === 'In Progress' ? 'selected' : ''}>⚡ In Progress</option>
+                                <option value="Submitted" ${grant.progress.status === 'Submitted' ? 'selected' : ''}>✅ Submitted</option>
+                                <option value="Under Review" ${grant.progress.status === 'Under Review' ? 'selected' : ''}>👀 Under Review</option>
+                                <option value="Approved" ${grant.progress.status === 'Approved' ? 'selected' : ''}>🎉 Approved</option>
+                                <option value="Rejected" ${grant.progress.status === 'Rejected' ? 'selected' : ''}>❌ Rejected</option>
+                                <option value="Resubmitting" ${grant.progress.status === 'Resubmitting' ? 'selected' : ''}>🔄 Resubmitting</option>
+                            </select>
+                            ${grant.progress.lastUpdated ? 
+                                `<div class="progress-date">Updated: ${new Date(grant.progress.lastUpdated).toLocaleDateString()}</div>` : ''}
+                            <div class="progress-notes">
+                                <textarea class="progress-notes-input" 
+                                          id="notes-${index}" 
+                                          placeholder="Add notes about this application..."
+                                          ${!grant.assigned ? 'disabled' : ''}>${grant.progress.notes || ''}</textarea>
+                                <button class="save-notes-btn" 
+                                        onclick="saveNotes(${index})"
+                                        ${!grant.assigned ? 'disabled' : ''}>Save Notes</button>
+                            </div>
+                        </div>
+                    </td>
                     <td>${grant.requirements}</td>
                 `;
                 
@@ -1423,6 +1682,7 @@
             });
             
             updateStats();
+            updateProgressStats();
         }
         
         // Update statistics
@@ -1494,6 +1754,85 @@
             }, 3000);
         }
         
+        // Update progress status
+        function updateProgress(index, status) {
+            const currentUser = document.getElementById('teamMemberName').value.trim();
+            const grant = fundingData[index];
+            
+            if (!currentUser) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                document.getElementById(`progress-${index}`).value = grant.progress.status;
+                return;
+            }
+            
+            if (grant.assigned && grant.assigned.name === currentUser) {
+                grant.progress.status = status;
+                grant.progress.lastUpdated = new Date().toISOString();
+                saveAssignments();
+                
+                // Update the select element's class
+                const selectElement = document.getElementById(`progress-${index}`);
+                selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+                
+                showNotification(`Progress updated to: ${status}`, 'success');
+                updateProgressStats();
+            } else {
+                showNotification('You can only update progress for grants assigned to you!', 'error');
+                document.getElementById(`progress-${index}`).value = grant.progress.status;
+            }
+        }
+        
+        // Save notes
+        function saveNotes(index) {
+            const currentUser = document.getElementById('teamMemberName').value.trim();
+            const grant = fundingData[index];
+            const notes = document.getElementById(`notes-${index}`).value;
+            
+            if (!currentUser) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                return;
+            }
+            
+            if (grant.assigned && grant.assigned.name === currentUser) {
+                grant.progress.notes = notes;
+                grant.progress.lastUpdated = new Date().toISOString();
+                saveAssignments();
+                showNotification('Notes saved successfully!', 'success');
+            } else {
+                showNotification('You can only update notes for grants assigned to you!', 'error');
+            }
+        }
+        
+        // Update progress statistics
+        function updateProgressStats() {
+            const statusCounts = {
+                'Not Started': 0,
+                'Researching': 0,
+                'Preparing': 0,
+                'In Progress': 0,
+                'Submitted': 0,
+                'Under Review': 0,
+                'Approved': 0,
+                'Rejected': 0,
+                'Resubmitting': 0
+            };
+            
+            fundingData.forEach(grant => {
+                if (grant.progress && grant.progress.status) {
+                    statusCounts[grant.progress.status]++;
+                }
+            });
+            
+            document.getElementById('notStartedCount').textContent = statusCounts['Not Started'];
+            document.getElementById('researchingCount').textContent = statusCounts['Researching'];
+            document.getElementById('preparingCount').textContent = statusCounts['Preparing'];
+            document.getElementById('submittedCount').textContent = statusCounts['Submitted'];
+            document.getElementById('underReviewCount').textContent = statusCounts['Under Review'];
+            document.getElementById('approvedCount').textContent = statusCounts['Approved'];
+        }
+        
         // Filter functions
         function filterMyAssignments() {
             const name = document.getElementById('teamMemberName').value.trim();
@@ -1518,6 +1857,17 @@
             const filtered = fundingData.filter(g => !g.assigned);
             renderTable(filtered);
             showNotification(`Showing ${filtered.length} available grant(s)`, 'success');
+        }
+        
+        function filterByProgress(status) {
+            const filtered = fundingData.filter(g => g.progress && g.progress.status === status);
+            
+            if (filtered.length === 0) {
+                showNotification(`No grants with status: ${status}`, 'error');
+            } else {
+                renderTable(filtered);
+                showNotification(`Showing ${filtered.length} grant(s) with status: ${status}`, 'success');
+            }
         }
         
         function showAll() {

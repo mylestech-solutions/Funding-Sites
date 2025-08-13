@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedZen Health Pan-African Funding Opportunities</title>
+    <title>MedZen Health Pan-African Funding Opportunities - Team Dashboard</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.98);
             border-radius: 20px;
@@ -88,6 +88,85 @@
             50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
         }
         
+        /* Team Assignment Panel */
+        .team-panel {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .team-panel h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        .team-controls {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .team-member-input {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .team-member-input label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .team-member-input input {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .team-member-input input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102,126,234,0.3);
+        }
+        
+        .team-stats {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            background: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .team-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .team-stat-number {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .team-stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
         .stats {
             display: flex;
             justify-content: space-around;
@@ -127,7 +206,15 @@
             font-weight: 600;
         }
         
-        .download-btn {
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
             border: none;
@@ -135,15 +222,21 @@
             font-size: 1.1em;
             border-radius: 50px;
             cursor: pointer;
-            margin: 20px auto;
-            display: block;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(245,87,108,0.4);
         }
         
-        .download-btn:hover {
+        .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(245,87,108,0.5);
+        }
+        
+        .filter-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .clear-btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
         }
         
         .table-wrapper {
@@ -168,12 +261,13 @@
             padding: 20px 18px;
             text-align: left;
             font-weight: 700;
-            font-size: 1.15em;
+            font-size: 1.1em;
             letter-spacing: 0.5px;
             position: sticky;
             top: 0;
             z-index: 10;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            white-space: nowrap;
         }
         
         th:first-child {
@@ -191,8 +285,16 @@
         
         tbody tr:hover {
             background: linear-gradient(90deg, rgba(102,126,234,0.08) 0%, rgba(118,75,162,0.08) 100%);
-            transform: scale(1.02);
+            transform: scale(1.01);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        tbody tr.assigned {
+            background: linear-gradient(90deg, rgba(46,204,113,0.1) 0%, rgba(39,174,96,0.1) 100%);
+        }
+        
+        tbody tr.assigned:hover {
+            background: linear-gradient(90deg, rgba(46,204,113,0.15) 0%, rgba(39,174,96,0.15) 100%);
         }
         
         td {
@@ -279,6 +381,125 @@
             50% { opacity: 0.7; }
         }
         
+        /* Assignment Column Styles */
+        .assignment-cell {
+            min-width: 200px;
+        }
+        
+        .assignment-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .assign-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(102,126,234,0.3);
+        }
+        
+        .assign-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.5);
+        }
+        
+        .assign-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .assigned-info {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.95em;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            box-shadow: 0 3px 10px rgba(46,204,113,0.3);
+        }
+        
+        .assigned-to {
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .assigned-date {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+        
+        .unassign-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .unassign-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: slideIn 0.5s ease, slideOut 0.5s ease 2.5s forwards;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            color: white;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        
         .footer {
             text-align: center;
             margin-top: 40px;
@@ -286,14 +507,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 15px;
             color: white;
-        }
-        
-        .africa-map {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-            font-size: 1.5em;
         }
         
         @media print {
@@ -305,7 +518,7 @@
                 box-shadow: none;
                 padding: 10px;
             }
-            .download-btn {
+            .action-buttons {
                 display: none;
             }
         }
@@ -321,6 +534,13 @@
                 padding: 10px 8px;
                 font-size: 0.8em;
             }
+            .team-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .team-member-input input {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -328,8 +548,33 @@
     <div class="container">
         <div class="header">
             <h1>🌍 MedZen Health Pan-African Funding Dashboard</h1>
-            <p class="subtitle">Your Roadmap to $10 Million for Continental Telemedicine Expansion</p>
+            <p class="subtitle">Team Collaboration Portal - Track & Assign Grant Applications</p>
             <div class="pan-african-badge">🚀 Targeting All 54 African Countries</div>
+        </div>
+        
+        <!-- Team Assignment Panel -->
+        <div class="team-panel">
+            <h3>👥 Team Assignment Control</h3>
+            <div class="team-controls">
+                <div class="team-member-input">
+                    <label for="teamMemberName">Your Name:</label>
+                    <input type="text" id="teamMemberName" placeholder="Enter your name" />
+                </div>
+                <div class="team-stats">
+                    <div class="team-stat">
+                        <span class="team-stat-number" id="totalGrants">0</span>
+                        <span class="team-stat-label">Total Grants</span>
+                    </div>
+                    <div class="team-stat">
+                        <span class="team-stat-number" id="assignedGrants">0</span>
+                        <span class="team-stat-label">Assigned</span>
+                    </div>
+                    <div class="team-stat">
+                        <span class="team-stat-number" id="availableGrants">0</span>
+                        <span class="team-stat-label">Available</span>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="stats">
@@ -351,11 +596,12 @@
             </div>
         </div>
         
-        <div class="africa-map">
-            <span>🇨🇲 🇨🇫 🇧🇯 → Starting Markets → 🌍 All Africa</span>
+        <div class="action-buttons">
+            <button class="action-btn" onclick="downloadTable()">📥 Download Complete Table</button>
+            <button class="action-btn filter-btn" onclick="filterMyAssignments()">🔍 Show My Assignments</button>
+            <button class="action-btn filter-btn" onclick="filterAvailable()">✅ Show Available Only</button>
+            <button class="action-btn clear-btn" onclick="showAll()">🔄 Show All Grants</button>
         </div>
-        
-        <button class="download-btn" onclick="downloadTable()">📥 Download Complete Funding Table</button>
         
         <div class="table-wrapper">
             <table id="fundingTable">
@@ -368,379 +614,12 @@
                         <th>Timeline</th>
                         <th>Priority</th>
                         <th>Contact / Apply</th>
+                        <th>Assignment Status</th>
                         <th>Key Requirements</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <!-- PAN-AFRICAN SPECIFIC OPPORTUNITIES -->
-                    <tr>
-                        <td><span class="tier-badge tier-pan">PAN-AF</span></td>
-                        <td><strong>Africa CDC Digital Health</strong></td>
-                        <td><span class="funding-amount">$100M Fund</span></td>
-                        <td>PPP Grants</td>
-                        <td><span class="timeline">2024-2030</span></td>
-                        <td><span class="priority-high">TOP PRIORITY</span></td>
-                        <td><a href="https://africacdc.org/programme/africa-cdc-digital-transformation-strategy/" class="contact-link" target="_blank">Website</a> | <a href="mailto:digitalhealth@africacdc.org" class="contact-link">Email</a></td>
-                        <td>Pan-African telemedicine focus</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-pan">PAN-AF</span></td>
-                        <td><strong>Africa50 Infrastructure</strong></td>
-                        <td><span class="funding-amount">$10M - $100M</span></td>
-                        <td>Infrastructure Investment</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://www.africa50.com/contact-us/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@africa50.com" class="contact-link">Email</a></td>
-                        <td>Min 3 countries required</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-pan">PAN-AF</span></td>
-                        <td><strong>Afreximbank Healthcare</strong></td>
-                        <td><span class="funding-amount">Up to $200M</span></td>
-                        <td>Equipment Facility</td>
-                        <td><span class="timeline">7-year loans</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://www.afreximbank.com/" class="contact-link" target="_blank">afreximbank.com</a></td>
-                        <td>All 54 AU states eligible</td>
-                    </tr>
-                    
-                    <!-- Tier 1: Immediate High Priority -->
-                    <tr>
-                        <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>UNICEF Innovation Fund</strong></td>
-                        <td><span class="funding-amount">$100,000</span></td>
-                        <td>Equity-Free Grant</td>
-                        <td><span class="timeline">Rolling 2024-2025</span></td>
-                        <td><span class="priority-high">TOP PRIORITY</span></td>
-                        <td><a href="https://www.unicef.org/innovation/venturefund/call-for-health-solutions" class="contact-link" target="_blank">Apply Here</a></td>
-                        <td>All 54 African countries eligible</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>USAID DIV</strong></td>
-                        <td><span class="funding-amount">$200K → $5M</span></td>
-                        <td>Tiered Grant</td>
-                        <td><span class="timeline">Rolling</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://www.usaid.gov/div" class="contact-link" target="_blank">Website</a> | <a href="https://divportal.usaid.gov/s/apply" class="contact-link" target="_blank">Apply</a></td>
-                        <td>Pan-African = higher funding</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>Gates Foundation Grand Challenges</strong></td>
-                        <td><span class="funding-amount">$100K → $1M</span></td>
-                        <td>Innovation Grant</td>
-                        <td><span class="timeline">Biannual</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://gcgh.grandchallenges.org/" class="contact-link" target="_blank">Website</a> | <a href="https://gcgh.grandchallenges.org/grants" class="contact-link" target="_blank">Apply</a></td>
-                        <td>Continental solutions priority</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>Gates Foundation i3 Program</strong></td>
-                        <td><span class="funding-amount">$50K → $5M</span></td>
-                        <td>Scale-up Grant</td>
-                        <td><span class="timeline">Annual</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://www.gatesfoundation.org/our-work/places/africa" class="contact-link" target="_blank">Africa Programs</a> | <a href="https://www.gatesfoundation.org/about/how-we-work/quick-links/grants-database" class="contact-link" target="_blank">Grants Database</a></td>
-                        <td>21+ African countries funded</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>Grand Challenges Africa</strong></td>
-                        <td><span class="funding-amount">$100K seed</span></td>
-                        <td>Innovation Grant</td>
-                        <td><span class="timeline">April 24, 2025</span></td>
-                        <td><span class="priority-high">URGENT</span></td>
-                        <td><a href="https://www.aasciences.africa/aesa/programmes/grand-challenges-africa" class="contact-link" target="_blank">AAS Website</a> | <a href="https://www.grandchallenges.ca/funding-opportunities/" class="contact-link" target="_blank">Apply</a></td>
-                        <td>African Academy of Sciences</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-1">Tier 1</span></td>
-                        <td><strong>Google Black Founders Fund</strong></td>
-                        <td><span class="funding-amount">$100K + $200K credits</span></td>
-                        <td>Equity-Free</td>
-                        <td><span class="timeline">Q2 2025</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://startup.google.com/programs/accelerator/africa/" class="contact-link" target="_blank">Accelerator</a> | <a href="https://startup.google.com/blackfoundersfund-africa/" class="contact-link" target="_blank">Apply</a></td>
-                        <td>All African countries eligible</td>
-                    </tr>
-                    
-                    <!-- Tier 2: Pan-African VCs -->
-                    <tr>
-                        <td><span class="tier-badge tier-2">Tier 2</span></td>
-                        <td><strong>Partech Africa</strong></td>
-                        <td><span class="funding-amount">$500K - $5M</span></td>
-                        <td>Equity (Seed-Series B)</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td><span class="priority-high">TOP VC</span></td>
-                        <td><a href="https://partechpartners.com/" class="contact-link" target="_blank">Website</a> | <a href="https://partechpartners.com/contact" class="contact-link" target="_blank">Contact Form</a></td>
-                        <td>$143M fund, 20+ countries</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-2">Tier 2</span></td>
-                        <td><strong>TLcom Capital</strong></td>
-                        <td><span class="funding-amount">$500K - $15M</span></td>
-                        <td>Equity</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://tlcomcapital.com/contact/" class="contact-link" target="_blank">Website</a> | <a href="mailto:hello@tlcomcapital.com" class="contact-link">Email</a></td>
-                        <td>$154M TIDE Africa Fund II</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-2">Tier 2</span></td>
-                        <td><strong>Bamboo Capital Partners</strong></td>
-                        <td><span class="funding-amount">$500K - $10M</span></td>
-                        <td>Equity/Debt</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>High</td>
-                        <td><a href="https://bamboocp.com/contact/" class="contact-link" target="_blank">Website</a> | <a href="mailto:jean-philippe@bamboocp.com" class="contact-link">Email</a></td>
-                        <td>30+ African countries portfolio</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-2">Tier 2</span></td>
-                        <td><strong>Acumen</strong></td>
-                        <td><span class="funding-amount">$100K - $3M</span></td>
-                        <td>Patient Capital</td>
-                        <td><span class="timeline">7-12 years</span></td>
-                        <td>High</td>
-                        <td><a href="https://acumen.org/" class="contact-link" target="_blank">acumen.org</a></td>
-                        <td>20+ African countries</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-2">Tier 2</span></td>
-                        <td><strong>4DX Ventures</strong></td>
-                        <td><span class="funding-amount">$500K - $5M</span></td>
-                        <td>Equity</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://www.4dxventures.com/" class="contact-link" target="_blank">Website</a> | <a href="https://www.4dxventures.com/contact" class="contact-link" target="_blank">Contact</a></td>
-                        <td>$60M Fund II, mPharma in 9 countries</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-2">Tier 2</span></td>
-                        <td><strong>Novastar Ventures</strong></td>
-                        <td><span class="funding-amount">$1M - $15M</span></td>
-                        <td>Equity</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://www.novastarventures.com/" class="contact-link" target="_blank">Website</a> | <a href="https://www.novastarventures.com/contact" class="contact-link" target="_blank">Contact</a></td>
-                        <td>$200M Africa People+Planet Fund</td>
-                    </tr>
-                    
-                    <!-- Tier 3: Development Finance -->
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>World Bank DE4A</strong></td>
-                        <td><span class="funding-amount">$25B by 2030</span></td>
-                        <td>Digital Economy Fund</td>
-                        <td><span class="timeline">2024-2030</span></td>
-                        <td><span class="priority-high">MAJOR</span></td>
-                        <td><a href="https://www.worldbank.org/en/programs/all-africa-digital-transformation" class="contact-link" target="_blank">Apply Here</a></td>
-                        <td>Digital health infrastructure</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>EU Global Gateway</strong></td>
-                        <td><span class="funding-amount">€10B Health</span></td>
-                        <td>Investment Package</td>
-                        <td><span class="timeline">2021-2027</span></td>
-                        <td><span class="priority-high">HIGH</span></td>
-                        <td><a href="https://international-partnerships.ec.europa.eu/policies/global-gateway_en" class="contact-link" target="_blank">EU Delegations</a></td>
-                        <td>€150B total for Africa</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>IFC Digital Health</strong></td>
-                        <td><span class="funding-amount">$5K - $10M</span></td>
-                        <td>Loans/Equity</td>
-                        <td><span class="timeline">Rolling</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.ifc.org/en/what-we-do/sector-expertise/health" class="contact-link" target="_blank">Website</a> | <a href="mailto:amef@ifc.org" class="contact-link">Email</a></td>
-                        <td>All African countries</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>AfDB Health Initiative</strong></td>
-                        <td><span class="funding-amount">$3B over 10 years</span></td>
-                        <td>Loans/Grants</td>
-                        <td><span class="timeline">2024-2034</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.afdb.org/en/topics-and-sectors/sectors/health" class="contact-link" target="_blank">Website</a> | <a href="mailto:bomilola@afdb.org" class="contact-link">Email</a></td>
-                        <td>Africa Investment Forum access</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-3">Tier 3</span></td>
-                        <td><strong>Proparco Transform Health</strong></td>
-                        <td><span class="funding-amount">$111M Fund</span></td>
-                        <td>Blended Finance</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.proparco.fr/en" class="contact-link" target="_blank">Website</a> | <a href="https://www.proparco.fr/en/contact" class="contact-link" target="_blank">Contact</a></td>
-                        <td>40+ African countries</td>
-                    </tr>
-                    
-                    <!-- Tier 4: Government Grants -->
-                    <tr>
-                        <td><span class="tier-badge tier-4">Tier 4</span></td>
-                        <td><strong>AFD Fund for Innovation</strong></td>
-                        <td><span class="funding-amount">€100K - €3M</span></td>
-                        <td>Grant</td>
-                        <td><span class="timeline">Rolling</span></td>
-                        <td>High</td>
-                        <td><a href="https://fundinnovation.dev/" class="contact-link" target="_blank">Website</a> | <a href="https://fundinnovation.dev/en/application-form-step-0/" class="contact-link" target="_blank">Apply</a></td>
-                        <td>All 54 African countries</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-4">Tier 4</span></td>
-                        <td><strong>AUDA-NEPAD</strong></td>
-                        <td><span class="funding-amount">$500K - $5M</span></td>
-                        <td>AU Grants</td>
-                        <td><span class="timeline">Project-based</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.nepad.org/" class="contact-link" target="_blank">Website</a> | <a href="https://www.nepad.org/contact" class="contact-link" target="_blank">Contact</a></td>
-                        <td>Cross-border solutions</td>
-                    </tr>
-                    
-                    <!-- Tier 5: Corporate Programs -->
-                    <tr>
-                        <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>Mastercard Foundation</strong></td>
-                        <td><span class="funding-amount">$200M Health Tech</span></td>
-                        <td>Young Africa Works</td>
-                        <td><span class="timeline">2024-2030</span></td>
-                        <td>High</td>
-                        <td><a href="https://mastercardfdn.org/our-work/where-we-work/africa/" class="contact-link" target="_blank">Website</a> | <a href="https://mastercardfdn.org/contact/" class="contact-link" target="_blank">Contact</a></td>
-                        <td>35+ African countries, job creation</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>Orange Digital Centers</strong></td>
-                        <td><span class="funding-amount">€50K - €500K</span></td>
-                        <td>Accelerator + Investment</td>
-                        <td><span class="timeline">Cohort-based</span></td>
-                        <td>High</td>
-                        <td><a href="https://ventures.orange.com" class="contact-link" target="_blank">Website</a> | <a href="https://www.orangedigitalcenters.com/" class="contact-link" target="_blank">Digital Centers</a></td>
-                        <td>17 African countries, expanding to 32</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>Microsoft AI for Health</strong></td>
-                        <td><span class="funding-amount">$10K - $100K</span></td>
-                        <td>Azure Credits + Grant</td>
-                        <td><span class="timeline">Quarterly</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://www.microsoft.com/en-us/ai/ai-for-health" class="contact-link" target="_blank">AI for Health</a> | <a href="https://www.microsoft.com/africa/" class="contact-link" target="_blank">Microsoft Africa</a></td>
-                        <td>Africa-led projects priority</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>J&J Africa Innovation</strong></td>
-                        <td><span class="funding-amount">$50,000</span></td>
-                        <td>Competition</td>
-                        <td><span class="timeline">Annual</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://jnjinnovation.com/" class="contact-link" target="_blank">Website</a> | <a href="https://jnjinnovation.com/jlabs/locations/africa" class="contact-link" target="_blank">J&J Africa</a></td>
-                        <td>All African countries eligible</td>
-                    </tr>
-                    
-                    <!-- Tier 6: Strategic Partnerships -->
-                    <tr>
-                        <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>Amref Health Africa</strong></td>
-                        <td><span class="funding-amount">Up to $2M</span></td>
-                        <td>Co-investment</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>High</td>
-                        <td><a href="https://amref.org" class="contact-link" target="_blank">Website</a> | <a href="https://amref.org/contact-us/" class="contact-link" target="_blank">Contact</a></td>
-                        <td>Largest African health NGO</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>PATH Digital Square</strong></td>
-                        <td><span class="funding-amount">$15M+ initiative</span></td>
-                        <td>Technical Partnership</td>
-                        <td><span class="timeline">Multi-year</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.path.org" class="contact-link" target="_blank">Website</a> | <a href="https://digitalsquare.org/" class="contact-link" target="_blank">Digital Square</a></td>
-                        <td>Government integration</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>CHAI Digital Health</strong></td>
-                        <td><span class="funding-amount">$50M Fund</span></td>
-                        <td>Partnership + Funding</td>
-                        <td><span class="timeline">2024-2027</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">Website</a> | <a href="https://www.clintonhealthaccess.org/contact/" class="contact-link" target="_blank">Contact</a></td>
-                        <td>28 African countries</td>
-                    </tr>
-                    
-                    <!-- Pan-African Accelerators -->
-                    <tr>
-                        <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>MEST Africa</strong></td>
-                        <td><span class="funding-amount">$100K investment</span></td>
-                        <td>Accelerator + Seed</td>
-                        <td><span class="timeline">12 months</span></td>
-                        <td>High</td>
-                        <td><a href="https://meltwater.org/" class="contact-link" target="_blank">Website</a> | <a href="https://mest.io/" class="contact-link" target="_blank">MEST.io</a></td>
-                        <td>Ghana, Nigeria, Kenya, SA, Senegal</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-5">Tier 5</span></td>
-                        <td><strong>Norrsken House</strong></td>
-                        <td><span class="funding-amount">Access to $200M+</span></td>
-                        <td>Hub + Network</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>High</td>
-                        <td><a href="https://www.norrskenhouse.org/" class="contact-link" target="_blank">Website</a> | <a href="https://www.norrskenfoundation.org/" class="contact-link" target="_blank">Foundation</a></td>
-                        <td>East & West Africa hubs</td>
-                    </tr>
-                    
-                    <!-- Mobile Network Partnerships -->
-                    <tr>
-                        <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>MTN Ambition 2025</strong></td>
-                        <td><span class="funding-amount">$1B Digital Services</span></td>
-                        <td>Partnership</td>
-                        <td><span class="timeline">2021-2025</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://www.mtn.com/" class="contact-link" target="_blank">Website</a> | <a href="https://www.mtn.com/innovation/" class="contact-link" target="_blank">Innovation Hub</a></td>
-                        <td>19 African markets</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-6">Tier 6</span></td>
-                        <td><strong>Safaricom M-TIBA</strong></td>
-                        <td><span class="funding-amount">Partnership</span></td>
-                        <td>Health Wallet Integration</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://www.safaricom.co.ke/" class="contact-link" target="_blank">Website</a> | <a href="https://www.safaricom.co.ke/sustainabilityreport_2020/stakeholder-engagement/" class="contact-link" target="_blank">Partnerships</a></td>
-                        <td>East Africa expansion</td>
-                    </tr>
-                    
-                    <!-- Tier 7: Crowdfunding -->
-                    <tr>
-                        <td><span class="tier-badge tier-7">Tier 7</span></td>
-                        <td><strong>M-Changa</strong></td>
-                        <td><span class="funding-amount">$1K - $500K</span></td>
-                        <td>Mobile Money Crowdfunding</td>
-                        <td><span class="timeline">Campaign-based</span></td>
-                        <td>Medium</td>
-                        <td><a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a></td>
-                        <td>Kenya, Uganda, Tanzania, Rwanda, Ghana, Nigeria</td>
-                    </tr>
-                    <tr>
-                        <td><span class="tier-badge tier-7">Tier 7</span></td>
-                        <td><strong>GlobalGiving</strong></td>
-                        <td><span class="funding-amount">$1K - $1M+</span></td>
-                        <td>Global Platform</td>
-                        <td><span class="timeline">Ongoing</span></td>
-                        <td>Low</td>
-                        <td><a href="https://globalgiving.org" class="contact-link" target="_blank">globalgiving.org</a></td>
-                        <td>175+ countries coverage</td>
-                    </tr>
+                <tbody id="tableBody">
+                    <!-- Table rows will be generated by JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -753,40 +632,922 @@
                 <strong>Market Opportunity:</strong> 1.4B people • $259B healthcare market • 90% access gap
             </p>
             <p style="margin-top: 10px; opacity: 0.9;">
-                <strong>Starting Markets:</strong> Cameroon 🇨🇲 → Central Africa → West Africa → All 54 Countries 🌍
-            </p>
-            <p style="margin-top: 15px; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
-                <strong>Total Accessible Funding Pool: $500M+ across all sources</strong>
+                <strong>Team Collaboration:</strong> Assign grants to yourself to avoid duplicate applications
             </p>
         </div>
     </div>
     
     <script>
+        // Funding data with assignment tracking
+        const fundingData = [
+            // PAN-AFRICAN SPECIFIC
+            {
+                tier: 'PAN-AF',
+                organization: 'Africa CDC Digital Health',
+                amount: '$100M Fund',
+                type: 'PPP Grants',
+                timeline: '2024-2030',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://africacdc.org" class="contact-link" target="_blank">Website</a>',
+                requirements: 'Pan-African telemedicine focus',
+                assigned: null
+            },
+            {
+                tier: 'PAN-AF',
+                organization: 'Africa50 Infrastructure',
+                amount: '$10M - $100M',
+                type: 'Infrastructure Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.africa50.com" class="contact-link" target="_blank">Website</a>',
+                requirements: 'Min 3 countries required',
+                assigned: null
+            },
+            {
+                tier: 'PAN-AF',
+                organization: 'Afreximbank Healthcare',
+                amount: 'Up to $200M',
+                type: 'Equipment Facility',
+                timeline: '7-year loans',
+                priority: 'HIGH',
+                contact: '<a href="https://www.afreximbank.com/" class="contact-link" target="_blank">afreximbank.com</a>',
+                requirements: 'All 54 AU states eligible',
+                assigned: null
+            },
+            // Tier 1
+            {
+                tier: '1',
+                organization: 'UNICEF Innovation Fund',
+                amount: '$100,000',
+                type: 'Equity-Free Grant',
+                timeline: 'Rolling 2024-2025',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.unicef.org/innovation" class="contact-link" target="_blank">Apply Here</a>',
+                requirements: 'All 54 African countries eligible',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'USAID DIV',
+                amount: '$200K → $5M',
+                type: 'Tiered Grant',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://www.usaid.gov/div" class="contact-link" target="_blank">Website</a>',
+                requirements: 'Pan-African = higher funding',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Gates Foundation Grand Challenges',
+                amount: '$100K → $1M',
+                type: 'Innovation Grant',
+                timeline: 'Biannual',
+                priority: 'HIGH',
+                contact: '<a href="https://gcgh.grandchallenges.org/" class="contact-link" target="_blank">Apply</a>',
+                requirements: 'Continental solutions priority',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Grand Challenges Africa',
+                amount: '$100K seed',
+                type: 'Innovation Grant',
+                timeline: 'April 24, 2025',
+                priority: 'URGENT',
+                contact: '<a href="https://www.aasciences.africa" class="contact-link" target="_blank">Apply</a>',
+                requirements: 'African Academy of Sciences',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Google Black Founders Fund',
+                amount: '$100K + $200K credits',
+                type: 'Equity-Free',
+                timeline: 'Q2 2025',
+                priority: 'HIGH',
+                contact: '<a href="https://startup.google.com" class="contact-link" target="_blank">Apply</a>',
+                requirements: 'All African countries eligible',
+                assigned: null
+            },
+            // Tier 2
+            {
+                tier: '2',
+                organization: 'Partech Africa',
+                amount: '$500K - $5M',
+                type: 'Equity (Seed-Series B)',
+                timeline: 'Ongoing',
+                priority: 'TOP VC',
+                contact: '<a href="https://partechpartners.com/" class="contact-link" target="_blank">Contact</a>',
+                requirements: '$143M fund, 20+ countries',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'TLcom Capital',
+                amount: '$500K - $15M',
+                type: 'Equity',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://tlcomcapital.com/" class="contact-link" target="_blank">Website</a>',
+                requirements: '$154M TIDE Africa Fund II',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Bamboo Capital Partners',
+                amount: '$500K - $10M',
+                type: 'Equity/Debt',
+                timeline: 'Ongoing',
+                priority: 'High',
+                contact: '<a href="https://bamboocp.com/" class="contact-link" target="_blank">Website</a>',
+                requirements: '30+ African countries portfolio',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Acumen',
+                amount: '$100K - $3M',
+                type: 'Patient Capital',
+                timeline: '7-12 years',
+                priority: 'High',
+                contact: '<a href="https://acumen.org/" class="contact-link" target="_blank">acumen.org</a>',
+                requirements: '20+ African countries',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: '4DX Ventures',
+                amount: '$500K - $5M',
+                type: 'Equity',
+                timeline: 'Ongoing',
+                priority: 'Medium',
+                contact: '<a href="https://www.4dxventures.com/" class="contact-link" target="_blank">Contact</a>',
+                requirements: '$60M Fund II',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Novastar Ventures',
+                amount: '$1M - $15M',
+                type: 'Equity',
+                timeline: 'Ongoing',
+                priority: 'Medium',
+                contact: '<a href="https://www.novastarventures.com/" class="contact-link" target="_blank">Contact</a>',
+                requirements: '$200M Africa People+Planet Fund',
+                assigned: null
+            },
+            // Tier 3
+            {
+                tier: '3',
+                organization: 'World Bank DE4A',
+                amount: '$25B by 2030',
+                type: 'Digital Economy Fund',
+                timeline: '2024-2030',
+                priority: 'MAJOR',
+                contact: '<a href="https://www.worldbank.org/" class="contact-link" target="_blank">Apply</a>',
+                requirements: 'Digital health infrastructure',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'EU Global Gateway',
+                amount: '€10B Health',
+                type: 'Investment Package',
+                timeline: '2021-2027',
+                priority: 'HIGH',
+                contact: '<a href="https://ec.europa.eu/" class="contact-link" target="_blank">EU Delegations</a>',
+                requirements: '€150B total for Africa',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'IFC Digital Health',
+                amount: '$5K - $10M',
+                type: 'Loans/Equity',
+                timeline: 'Rolling',
+                priority: 'High',
+                contact: '<a href="https://www.ifc.org/" class="contact-link" target="_blank">Website</a>',
+                requirements: 'All African countries',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'AfDB Health Initiative',
+                amount: '$3B over 10 years',
+                type: 'Loans/Grants',
+                timeline: '2024-2034',
+                priority: 'High',
+                contact: '<a href="https://www.afdb.org/" class="contact-link" target="_blank">Website</a>',
+                requirements: 'Africa Investment Forum access',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'Proparco Transform Health',
+                amount: '$111M Fund',
+                type: 'Blended Finance',
+                timeline: 'Ongoing',
+                priority: 'High',
+                contact: '<a href="https://www.proparco.fr/" class="contact-link" target="_blank">Contact</a>',
+                requirements: '40+ African countries',
+                assigned: null
+            },
+            // Tier 4
+            {
+                tier: '4',
+                organization: 'AFD Fund for Innovation',
+                amount: '€100K - €3M',
+                type: 'Grant',
+                timeline: 'Rolling',
+                priority: 'High',
+                contact: '<a href="https://fundinnovation.dev/" class="contact-link" target="_blank">Apply</a>',
+                requirements: 'All 54 African countries',
+                assigned: null
+            },
+            {
+                tier: '4',
+                organization: 'AUDA-NEPAD',
+                amount: '$500K - $5M',
+                type: 'AU Grants',
+                timeline: 'Project-based',
+                priority: 'High',
+                contact: '<a href="https://www.nepad.org/" class="contact-link" target="_blank">Contact</a>',
+                requirements: 'Cross-border solutions',
+                assigned: null
+            },
+            // Tier 5
+            {
+                tier: '5',
+                organization: 'Mastercard Foundation',
+                amount: '$200M Health Tech',
+                type: 'Young Africa Works',
+                timeline: '2024-2030',
+                priority: 'High',
+                contact: '<a href="https://mastercardfdn.org/" class="contact-link" target="_blank">Contact</a>',
+                requirements: '35+ African countries, job creation',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'Orange Digital Centers',
+                amount: '€50K - €500K',
+                type: 'Accelerator + Investment',
+                timeline: 'Cohort-based',
+                priority: 'High',
+                contact: '<a href="https://ventures.orange.com" class="contact-link" target="_blank">Digital Centers</a>',
+                requirements: '17 African countries',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'Microsoft AI for Health',
+                amount: '$10K - $100K',
+                type: 'Azure Credits + Grant',
+                timeline: 'Quarterly',
+                priority: 'Medium',
+                contact: '<a href="https://www.microsoft.com/" class="contact-link" target="_blank">AI for Health</a>',
+                requirements: 'Africa-led projects priority',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'J&J Africa Innovation',
+                amount: '$50,000',
+                type: 'Competition',
+                timeline: 'Annual',
+                priority: 'Medium',
+                contact: '<a href="https://jnjinnovation.com/" class="contact-link" target="_blank">J&J Africa</a>',
+                requirements: 'All African countries eligible',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'MEST Africa',
+                amount: '$100K investment',
+                type: 'Accelerator + Seed',
+                timeline: '12 months',
+                priority: 'High',
+                contact: '<a href="https://mest.io/" class="contact-link" target="_blank">MEST.io</a>',
+                requirements: 'Ghana, Nigeria, Kenya, SA, Senegal',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'Norrsken House',
+                amount: 'Access to $200M+',
+                type: 'Hub + Network',
+                timeline: 'Ongoing',
+                priority: 'High',
+                contact: '<a href="https://www.norrskenhouse.org/" class="contact-link" target="_blank">Foundation</a>',
+                requirements: 'East & West Africa hubs',
+                assigned: null
+            },
+            // Tier 6
+            {
+                tier: '6',
+                organization: 'Amref Health Africa',
+                amount: 'Up to $2M',
+                type: 'Co-investment',
+                timeline: 'Ongoing',
+                priority: 'High',
+                contact: '<a href="https://amref.org" class="contact-link" target="_blank">Contact</a>',
+                requirements: 'Largest African health NGO',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'PATH Digital Square',
+                amount: '$15M+ initiative',
+                type: 'Technical Partnership',
+                timeline: 'Multi-year',
+                priority: 'High',
+                contact: '<a href="https://digitalsquare.org/" class="contact-link" target="_blank">Digital Square</a>',
+                requirements: 'Government integration',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'CHAI Digital Health',
+                amount: '$50M Fund',
+                type: 'Partnership + Funding',
+                timeline: '2024-2027',
+                priority: 'High',
+                contact: '<a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">Contact</a>',
+                requirements: '28 African countries',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'MTN Ambition 2025',
+                amount: '$1B Digital Services',
+                type: 'Partnership',
+                timeline: '2021-2025',
+                priority: 'Medium',
+                contact: '<a href="https://www.mtn.com/" class="contact-link" target="_blank">Innovation Hub</a>',
+                requirements: '19 African markets',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'Safaricom M-TIBA',
+                amount: 'Partnership',
+                type: 'Health Wallet Integration',
+                timeline: 'Ongoing',
+                priority: 'Medium',
+                contact: '<a href="https://www.safaricom.co.ke/" class="contact-link" target="_blank">Partnerships</a>',
+                requirements: 'East Africa expansion',
+                assigned: null
+            },
+            // Tier 7
+            {
+                tier: '7',
+                organization: 'M-Changa',
+                amount: '$1K - $500K',
+                type: 'Mobile Money Crowdfunding',
+                timeline: 'Campaign-based',
+                priority: 'Medium',
+                contact: '<a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a>',
+                requirements: 'Kenya, Uganda, Tanzania, Rwanda',
+                assigned: null
+            },
+            {
+                tier: '7',
+                organization: 'GlobalGiving',
+                amount: '$1K - $1M+',
+                type: 'Global Platform',
+                timeline: 'Ongoing',
+                priority: 'Low',
+                contact: '<a href="https://globalgiving.org" class="contact-link" target="_blank">globalgiving.org</a>',
+                requirements: '175+ countries coverage',
+                assigned: null
+            },
+            // Additional High-Value Pan-African Grants
+            {
+                tier: 'PAN-AF',
+                organization: 'Tony Elumelu Foundation',
+                amount: '$5,000 seed',
+                type: 'Entrepreneurship Grant',
+                timeline: 'Annual - Q1',
+                priority: 'HIGH',
+                contact: '<a href="https://www.tonyelumelufoundation.org" class="contact-link" target="_blank">TEF Apply</a>',
+                requirements: 'All 54 African countries, 12-week training',
+                assigned: null
+            },
+            {
+                tier: 'PAN-AF',
+                organization: 'African Development Foundation',
+                amount: '$100K - $250K',
+                type: 'Direct Grant',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://www.usadf.gov" class="contact-link" target="_blank">USADF.gov</a>',
+                requirements: '31 African countries, grassroots focus',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Draper Richards Kaplan',
+                amount: '$300K over 3 years',
+                type: 'Unrestricted Grant',
+                timeline: 'Annual',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.drkfoundation.org" class="contact-link" target="_blank">Apply DRK</a>',
+                requirements: 'Global, scaling social enterprises',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Skoll Foundation',
+                amount: '$1.5M over 3 years',
+                type: 'Skoll Award',
+                timeline: 'Annual',
+                priority: 'MAJOR',
+                contact: '<a href="https://skoll.org" class="contact-link" target="_blank">Skoll.org</a>',
+                requirements: 'Systems change, proven model',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Wellcome Trust',
+                amount: '£100K - £5M',
+                type: 'Health Innovation',
+                timeline: 'Quarterly',
+                priority: 'HIGH',
+                contact: '<a href="https://wellcome.org" class="contact-link" target="_blank">Wellcome.org</a>',
+                requirements: 'Global health focus, Africa priority',
+                assigned: null
+            },
+            {
+                tier: '1',
+                organization: 'Conrad N. Hilton Foundation',
+                amount: '$500K - $2M',
+                type: 'Health Systems Grant',
+                timeline: 'Bi-annual',
+                priority: 'HIGH',
+                contact: '<a href="https://www.hiltonfoundation.org" class="contact-link" target="_blank">Hilton Foundation</a>',
+                requirements: 'Sub-Saharan Africa health systems',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Algebra Ventures',
+                amount: '$500K - $2M',
+                type: 'Seed/Series A',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://algebraventures.com" class="contact-link" target="_blank">Algebra VC</a>',
+                requirements: 'Egypt + expansion to Africa',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Sawari Ventures',
+                amount: '$500K - $5M',
+                type: 'Equity',
+                timeline: 'Ongoing',
+                priority: 'Medium',
+                contact: '<a href="https://sawariventures.com" class="contact-link" target="_blank">Sawari</a>',
+                requirements: 'North Africa + Sub-Saharan',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Kepple Africa Ventures',
+                amount: '$100K - $2M',
+                type: 'Early Stage Equity',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://kepple.co.ug" class="contact-link" target="_blank">Kepple Africa</a>',
+                requirements: '12+ African countries portfolio',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'CRE Venture Capital',
+                amount: '$250K - $5M',
+                type: 'Seed to Series A',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.crevcap.com" class="contact-link" target="_blank">CRE VC</a>',
+                requirements: 'East & West Africa focus',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'JICA (Japan)',
+                amount: '$1M - $50M',
+                type: 'ODA Loans/Grants',
+                timeline: 'Annual cycles',
+                priority: 'HIGH',
+                contact: '<a href="https://www.jica.go.jp/english" class="contact-link" target="_blank">JICA English</a>',
+                requirements: 'TICAD priority countries',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'KfW Development Bank',
+                amount: '€5M - €100M',
+                type: 'Development Finance',
+                timeline: 'Project-based',
+                priority: 'HIGH',
+                contact: '<a href="https://www.kfw-entwicklungsbank.de" class="contact-link" target="_blank">KfW DEG</a>',
+                requirements: 'German development cooperation',
+                assigned: null
+            },
+            {
+                tier: '3',
+                organization: 'China-Africa Development Fund',
+                amount: '$5M - $100M',
+                type: 'Equity/Debt',
+                timeline: 'Ongoing',
+                priority: 'MAJOR',
+                contact: '<a href="http://www.cadfund.com/en" class="contact-link" target="_blank">CAD Fund</a>',
+                requirements: 'China-Africa cooperation projects',
+                assigned: null
+            },
+            {
+                tier: '4',
+                organization: 'Rockefeller Foundation',
+                amount: '$100K - $5M',
+                type: 'Program Grants',
+                timeline: 'Quarterly',
+                priority: 'HIGH',
+                contact: '<a href="https://www.rockefellerfoundation.org" class="contact-link" target="_blank">Rockefeller</a>',
+                requirements: 'Health equity in Africa',
+                assigned: null
+            },
+            {
+                tier: '4',
+                organization: 'Ford Foundation',
+                amount: '$200K - $2M',
+                type: 'Multi-year Grants',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://www.fordfoundation.org" class="contact-link" target="_blank">Ford Foundation</a>',
+                requirements: 'Social justice & equity focus',
+                assigned: null
+            },
+            {
+                tier: '4',
+                organization: 'MacArthur Foundation',
+                amount: '$500K - $10M',
+                type: '100&Change Award',
+                timeline: 'Every 3 years',
+                priority: 'MAJOR',
+                contact: '<a href="https://www.macfound.org" class="contact-link" target="_blank">MacArthur</a>',
+                requirements: 'Bold solutions at scale',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'AWS Activate',
+                amount: '$100K credits',
+                type: 'Cloud Credits + Support',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://aws.amazon.com/activate" class="contact-link" target="_blank">AWS Activate</a>',
+                requirements: 'Startups globally',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'IBM Digital Nation Africa',
+                amount: '$50K - $200K value',
+                type: 'Tech + Training',
+                timeline: 'Ongoing',
+                priority: 'Medium',
+                contact: '<a href="https://www.ibm.com/africa" class="contact-link" target="_blank">IBM Africa</a>',
+                requirements: '15+ African countries',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'Cisco Global Problem Solver',
+                amount: '$250K grand prize',
+                type: 'Competition',
+                timeline: 'Annual',
+                priority: 'HIGH',
+                contact: '<a href="https://cisco.innovationchallenge.com" class="contact-link" target="_blank">Cisco Challenge</a>',
+                requirements: 'Tech for social impact',
+                assigned: null
+            },
+            {
+                tier: '5',
+                organization: 'META (Facebook) Accelerator',
+                amount: '$25K - $75K',
+                type: 'Accelerator Program',
+                timeline: 'Cohort-based',
+                priority: 'Medium',
+                contact: '<a href="https://developers.facebook.com/accelerator" class="contact-link" target="_blank">META Accelerator</a>',
+                requirements: 'Commerce & communities focus',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'Aga Khan Foundation',
+                amount: '$100K - $5M',
+                type: 'Development Grants',
+                timeline: 'Multi-year',
+                priority: 'HIGH',
+                contact: '<a href="https://www.akdn.org" class="contact-link" target="_blank">AKDN.org</a>',
+                requirements: '16 African countries presence',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'Catholic Relief Services',
+                amount: '$50K - $2M',
+                type: 'Partnership Grants',
+                timeline: 'Project-based',
+                priority: 'Medium',
+                contact: '<a href="https://www.crs.org" class="contact-link" target="_blank">CRS.org</a>',
+                requirements: '40+ African countries',
+                assigned: null
+            },
+            {
+                tier: '6',
+                organization: 'Save the Children',
+                amount: '$100K - $3M',
+                type: 'Health Programs',
+                timeline: 'Annual',
+                priority: 'HIGH',
+                contact: '<a href="https://www.savethechildren.org" class="contact-link" target="_blank">Save Children</a>',
+                requirements: 'Child health focus',
+                assigned: null
+            },
+            // Additional Impact Investors
+            {
+                tier: '2',
+                organization: 'Oikocredit',
+                amount: '€500K - €10M',
+                type: 'Impact Loans',
+                timeline: 'Ongoing',
+                priority: 'Medium',
+                contact: '<a href="https://www.oikocredit.coop" class="contact-link" target="_blank">Oikocredit</a>',
+                requirements: '33 African countries',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Root Capital',
+                amount: '$50K - $2M',
+                type: 'Working Capital',
+                timeline: 'Rolling',
+                priority: 'Medium',
+                contact: '<a href="https://rootcapital.org" class="contact-link" target="_blank">Root Capital</a>',
+                requirements: 'Agricultural value chains',
+                assigned: null
+            },
+            {
+                tier: '2',
+                organization: 'Investisseurs & Partenaires',
+                amount: '€300K - €3M',
+                type: 'Impact Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.ietp.com" class="contact-link" target="_blank">I&P</a>',
+                requirements: 'Sub-Saharan SMEs',
+                assigned: null
+            },
+            // Crowdfunding & Alternative Finance
+            {
+                tier: '7',
+                organization: 'Kiva',
+                amount: '$1K - $100K',
+                type: '0% Interest Loans',
+                timeline: 'Rolling',
+                priority: 'Medium',
+                contact: '<a href="https://www.kiva.org" class="contact-link" target="_blank">Kiva.org</a>',
+                requirements: 'Global crowdfunded loans',
+                assigned: null
+            },
+            {
+                tier: '7',
+                organization: 'GoFundMe',
+                amount: 'Unlimited',
+                type: 'Donation Crowdfunding',
+                timeline: 'Anytime',
+                priority: 'Low',
+                contact: '<a href="https://www.gofundme.com" class="contact-link" target="_blank">GoFundMe</a>',
+                requirements: 'Global platform',
+                assigned: null
+            },
+            {
+                tier: '7',
+                organization: 'Indiegogo',
+                amount: 'Unlimited',
+                type: 'Reward/Equity Crowdfunding',
+                timeline: 'Campaign-based',
+                priority: 'Low',
+                contact: '<a href="https://www.indiegogo.com" class="contact-link" target="_blank">Indiegogo</a>',
+                requirements: 'Tech & innovation focus',
+                assigned: null
+            }
+        ];
+        
+        // Load assignments from localStorage
+        function loadAssignments() {
+            const saved = localStorage.getItem('grantAssignments');
+            if (saved) {
+                const assignments = JSON.parse(saved);
+                fundingData.forEach((grant, index) => {
+                    if (assignments[index]) {
+                        grant.assigned = assignments[index];
+                    }
+                });
+            }
+        }
+        
+        // Save assignments to localStorage
+        function saveAssignments() {
+            const assignments = {};
+            fundingData.forEach((grant, index) => {
+                if (grant.assigned) {
+                    assignments[index] = grant.assigned;
+                }
+            });
+            localStorage.setItem('grantAssignments', JSON.stringify(assignments));
+        }
+        
+        // Get tier badge class
+        function getTierClass(tier) {
+            if (tier === 'PAN-AF') return 'tier-pan';
+            return `tier-${tier}`;
+        }
+        
+        // Get priority class
+        function getPriorityClass(priority) {
+            if (priority.includes('TOP') || priority.includes('URGENT') || priority.includes('HIGH') || priority.includes('MAJOR')) {
+                return 'priority-high';
+            }
+            return '';
+        }
+        
+        // Render table
+        function renderTable(data = fundingData) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach((grant, index) => {
+                const row = document.createElement('tr');
+                if (grant.assigned) {
+                    row.classList.add('assigned');
+                }
+                
+                row.innerHTML = `
+                    <td><span class="tier-badge ${getTierClass(grant.tier)}">Tier ${grant.tier}</span></td>
+                    <td><strong>${grant.organization}</strong></td>
+                    <td><span class="funding-amount">${grant.amount}</span></td>
+                    <td>${grant.type}</td>
+                    <td><span class="timeline">${grant.timeline}</span></td>
+                    <td>${grant.priority.includes('TOP') || grant.priority.includes('URGENT') || grant.priority.includes('HIGH') || grant.priority.includes('MAJOR') ? 
+                        `<span class="${getPriorityClass(grant.priority)}">${grant.priority}</span>` : grant.priority}</td>
+                    <td>${grant.contact}</td>
+                    <td class="assignment-cell">
+                        <div class="assignment-container" id="assign-${index}">
+                            ${grant.assigned ? 
+                                `<div class="assigned-info">
+                                    <span class="assigned-to">${grant.assigned.name}</span>
+                                    <span class="assigned-date">${new Date(grant.assigned.date).toLocaleDateString()}</span>
+                                    <button class="unassign-btn" onclick="unassignGrant(${index})">Unassign</button>
+                                </div>` :
+                                `<button class="assign-btn" onclick="assignGrant(${index})">Assign to Me</button>`
+                            }
+                        </div>
+                    </td>
+                    <td>${grant.requirements}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            updateStats();
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const total = fundingData.length;
+            const assigned = fundingData.filter(g => g.assigned).length;
+            const available = total - assigned;
+            
+            document.getElementById('totalGrants').textContent = total;
+            document.getElementById('assignedGrants').textContent = assigned;
+            document.getElementById('availableGrants').textContent = available;
+        }
+        
+        // Assign grant
+        function assignGrant(index) {
+            const name = document.getElementById('teamMemberName').value.trim();
+            
+            if (!name) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                return;
+            }
+            
+            fundingData[index].assigned = {
+                name: name,
+                date: new Date().toISOString()
+            };
+            
+            saveAssignments();
+            renderTable();
+            showNotification(`Grant assigned to ${name}!`, 'success');
+        }
+        
+        // Unassign grant
+        function unassignGrant(index) {
+            const grant = fundingData[index];
+            const currentUser = document.getElementById('teamMemberName').value.trim();
+            
+            if (!currentUser) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                return;
+            }
+            
+            if (grant.assigned && grant.assigned.name === currentUser) {
+                fundingData[index].assigned = null;
+                saveAssignments();
+                renderTable();
+                showNotification('Grant unassigned successfully!', 'success');
+            } else {
+                showNotification('You can only unassign grants assigned to you!', 'error');
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            const existing = document.querySelector('.notification');
+            if (existing) {
+                existing.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        // Filter functions
+        function filterMyAssignments() {
+            const name = document.getElementById('teamMemberName').value.trim();
+            
+            if (!name) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                return;
+            }
+            
+            const filtered = fundingData.filter(g => g.assigned && g.assigned.name === name);
+            
+            if (filtered.length === 0) {
+                showNotification('No grants assigned to you yet!', 'error');
+            } else {
+                renderTable(filtered);
+                showNotification(`Showing ${filtered.length} grant(s) assigned to ${name}`, 'success');
+            }
+        }
+        
+        function filterAvailable() {
+            const filtered = fundingData.filter(g => !g.assigned);
+            renderTable(filtered);
+            showNotification(`Showing ${filtered.length} available grant(s)`, 'success');
+        }
+        
+        function showAll() {
+            renderTable();
+            showNotification('Showing all grants', 'success');
+        }
+        
+        // Download table function
         function downloadTable() {
-            // Create CSV content
             const table = document.getElementById('fundingTable');
             let csv = [];
             
             // Get headers
-            const headers = [];
-            const headerCells = table.querySelectorAll('thead th');
-            headerCells.forEach(cell => {
-                headers.push('"' + cell.textContent.trim() + '"');
-            });
+            const headers = ['Tier', 'Organization', 'Funding Amount', 'Type', 'Timeline', 'Priority', 'Contact', 'Assigned To', 'Assignment Date', 'Key Requirements'];
             csv.push(headers.join(','));
             
             // Get data rows
-            const rows = table.querySelectorAll('tbody tr');
-            rows.forEach(row => {
-                const rowData = [];
-                const cells = row.querySelectorAll('td');
-                cells.forEach(cell => {
-                    // Clean the text content
-                    let text = cell.textContent.trim();
-                    // Remove any commas and quotes for CSV compatibility
-                    text = text.replace(/"/g, '""');
-                    rowData.push('"' + text + '"');
-                });
+            fundingData.forEach(grant => {
+                const rowData = [
+                    `"Tier ${grant.tier}"`,
+                    `"${grant.organization}"`,
+                    `"${grant.amount}"`,
+                    `"${grant.type}"`,
+                    `"${grant.timeline}"`,
+                    `"${grant.priority}"`,
+                    `"${grant.contact.replace(/<[^>]*>/g, '')}"`,
+                    `"${grant.assigned ? grant.assigned.name : 'Available'}"`,
+                    `"${grant.assigned ? new Date(grant.assigned.date).toLocaleDateString() : ''}"`,
+                    `"${grant.requirements}"`
+                ];
                 csv.push(rowData.join(','));
             });
             
@@ -797,27 +1558,34 @@
             const url = URL.createObjectURL(blob);
             
             link.setAttribute('href', url);
-            link.setAttribute('download', 'MedZen_Health_PanAfrican_Funding_Opportunities.csv');
+            link.setAttribute('download', 'MedZen_Health_Team_Grant_Assignments.csv');
             link.style.visibility = 'hidden';
             
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            // Show success message
-            const btn = document.querySelector('.download-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✅ Downloaded Successfully!';
-            btn.style.background = 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
-            }, 2000);
+            showNotification('Table downloaded successfully!', 'success');
         }
         
-        // Add animation on load
+        // Save team member name to localStorage
+        document.getElementById('teamMemberName').addEventListener('input', function() {
+            localStorage.setItem('teamMemberName', this.value);
+        });
+        
+        // Initialize on load
         window.addEventListener('load', () => {
+            // Load saved name
+            const savedName = localStorage.getItem('teamMemberName');
+            if (savedName) {
+                document.getElementById('teamMemberName').value = savedName;
+            }
+            
+            // Load assignments and render table
+            loadAssignments();
+            renderTable();
+            
+            // Animate rows
             const rows = document.querySelectorAll('tbody tr');
             rows.forEach((row, index) => {
                 row.style.opacity = '0';
@@ -828,13 +1596,6 @@
                     row.style.transform = 'translateY(0)';
                 }, index * 30);
             });
-        });
-        
-        // Print functionality
-        window.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'p') {
-                window.print();
-            }
         });
     </script>
 </body>

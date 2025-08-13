@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedZen Health Pan-African Funding Opportunities - Team Dashboard</title>
+    
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         * {
             margin: 0;
@@ -782,6 +786,8 @@
             <button class="action-btn" onclick="downloadTable()">📥 Download Complete Table</button>
             <button class="action-btn filter-btn" onclick="filterMyAssignments()">🔍 Show My Assignments</button>
             <button class="action-btn filter-btn" onclick="filterAvailable()">✅ Show Available Only</button>
+            <button class="action-btn filter-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);" onclick="filterByProgress('Submitted')">📨 Show Submitted</button>
+            <button class="action-btn filter-btn" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);" onclick="filterByProgress('Approved')">🎉 Show Approved</button>
             <button class="action-btn clear-btn" onclick="showAll()">🔄 Show All Grants</button>
         </div>
         
@@ -821,6 +827,217 @@
     </div>
     
     <script>
+        // ============================================
+        // SUPABASE CONFIGURATION - YOUR PROJECT DETAILS
+        // ============================================
+        const SUPABASE_URL = 'https://wgstbqsbgnjncartcbuq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indnc3RicXNiZ25qbmNhcnRjYnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2MjY2NDAsImV4cCI6MjA3MDIwMjY0MH0.yUKf9vEQFTMojrUMoaL_MdsHV0-wURPBQ5muJwLi48Y';
+        
+        // Initialize Supabase client
+        let supabase;
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL') {
+            const { createClient } = window.supabase;
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+        
+        // Check if Supabase is configured
+        function isSupabaseConfigured() {
+            return SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && supabase;
+        }
+        
+        // Initialize grants in Supabase (run once)
+        async function initializeSupabaseData() {
+            if (!isSupabaseConfigured()) {
+                console.log('Supabase not configured, using local storage');
+                return;
+            }
+            
+            try {
+                // Check if grants already exist
+                const { data: existingGrants, error: checkError } = await supabase
+                    .from('grants')
+                    .select('*')
+                    .limit(1);
+                
+                if (existingGrants && existingGrants.length > 0) {
+                    console.log('Grants already initialized in Supabase');
+                    return;
+                }
+                
+                // Insert all grants
+                const grantsToInsert = fundingData.map(grant => ({
+                    tier: grant.tier,
+                    organization: grant.organization,
+                    amount: grant.amount,
+                    type: grant.type,
+                    timeline: grant.timeline,
+                    priority: grant.priority,
+                    contact: grant.contact,
+                    requirements: grant.requirements
+                }));
+                
+                const { data, error } = await supabase
+                    .from('grants')
+                    .insert(grantsToInsert);
+                
+                if (error) {
+                    console.error('Error initializing grants:', error);
+                } else {
+                    console.log('Grants initialized successfully in Supabase');
+                    showNotification('Database initialized with all grants!', 'success');
+                }
+            } catch (err) {
+                console.error('Error connecting to Supabase:', err);
+            }
+        }
+        
+        // Load grants from Supabase
+        async function loadFromSupabase() {
+            if (!isSupabaseConfigured()) {
+                loadAssignments(); // Fall back to local storage
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('grant_details')
+                    .select('*')
+                    .order('id');
+                
+                if (error) {
+                    console.error('Error loading from Supabase:', error);
+                    loadAssignments(); // Fall back to local storage
+                    return;
+                }
+                
+                // Update fundingData with Supabase data
+                if (data && data.length > 0) {
+                    fundingData.length = 0; // Clear existing data
+                    data.forEach(grant => {
+                        fundingData.push({
+                            id: grant.id,
+                            tier: grant.tier,
+                            organization: grant.organization,
+                            amount: grant.amount,
+                            type: grant.type,
+                            timeline: grant.timeline,
+                            priority: grant.priority,
+                            contact: grant.contact,
+                            requirements: grant.requirements,
+                            assigned: grant.assigned_to ? {
+                                name: grant.assigned_to,
+                                date: grant.assigned_date
+                            } : null,
+                            progress: {
+                                status: grant.progress_status || 'Not Started',
+                                notes: grant.progress_notes || '',
+                                lastUpdated: grant.progress_updated,
+                                updatedBy: grant.updated_by
+                            }
+                        });
+                    });
+                    console.log('Loaded grants from Supabase');
+                } else {
+                    // Initialize Supabase with existing data
+                    await initializeSupabaseData();
+                }
+            } catch (err) {
+                console.error('Error loading from Supabase:', err);
+                loadAssignments(); // Fall back to local storage
+            }
+        }
+        
+        // Save assignment to Supabase
+        async function saveAssignmentToSupabase(grantId, assignedTo) {
+            if (!isSupabaseConfigured()) return false;
+            
+            try {
+                // First delete any existing assignment
+                await supabase
+                    .from('assignments')
+                    .delete()
+                    .eq('grant_id', grantId);
+                
+                // Insert new assignment
+                if (assignedTo) {
+                    const { error } = await supabase
+                        .from('assignments')
+                        .insert({
+                            grant_id: grantId,
+                            assigned_to: assignedTo
+                        });
+                    
+                    if (error) {
+                        console.error('Error saving assignment:', error);
+                        return false;
+                    }
+                }
+                return true;
+            } catch (err) {
+                console.error('Error saving to Supabase:', err);
+                return false;
+            }
+        }
+        
+        // Save progress to Supabase
+        async function saveProgressToSupabase(grantId, status, notes, updatedBy) {
+            if (!isSupabaseConfigured()) return false;
+            
+            try {
+                const { error } = await supabase
+                    .from('progress')
+                    .upsert({
+                        grant_id: grantId,
+                        status: status,
+                        notes: notes,
+                        updated_by: updatedBy,
+                        last_updated: new Date().toISOString()
+                    }, {
+                        onConflict: 'grant_id'
+                    });
+                
+                if (error) {
+                    console.error('Error saving progress:', error);
+                    return false;
+                }
+                return true;
+            } catch (err) {
+                console.error('Error saving progress to Supabase:', err);
+                return false;
+            }
+        }
+        
+        // Set up real-time subscription
+        function setupRealtimeUpdates() {
+            if (!isSupabaseConfigured()) return;
+            
+            // Subscribe to assignment changes
+            supabase
+                .channel('assignments-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'assignments' },
+                    (payload) => {
+                        console.log('Assignment change received:', payload);
+                        loadFromSupabase().then(() => renderTable());
+                    }
+                )
+                .subscribe();
+            
+            // Subscribe to progress changes
+            supabase
+                .channel('progress-channel')
+                .on('postgres_changes',
+                    { event: '*', schema: 'public', table: 'progress' },
+                    (payload) => {
+                        console.log('Progress change received:', payload);
+                        loadFromSupabase().then(() => renderTable());
+                    }
+                )
+                .subscribe();
+                
+            console.log('Real-time updates enabled');
+        }
+        
         // Funding data with assignment tracking
         const fundingData = [
             // PAN-AFRICAN SPECIFIC
@@ -1696,8 +1913,8 @@
             document.getElementById('availableGrants').textContent = available;
         }
         
-        // Assign grant
-        function assignGrant(index) {
+        // Modified assignGrant function to work with Supabase
+        async function assignGrant(index) {
             const name = document.getElementById('teamMemberName').value.trim();
             
             if (!name) {
@@ -1706,7 +1923,21 @@
                 return;
             }
             
-            fundingData[index].assigned = {
+            const grant = fundingData[index];
+            
+            // Save to Supabase if configured
+            if (isSupabaseConfigured() && grant.id) {
+                const success = await saveAssignmentToSupabase(grant.id, name);
+                if (success) {
+                    showNotification(`Grant assigned to ${name}!`, 'success');
+                    await loadFromSupabase();
+                    renderTable();
+                    return;
+                }
+            }
+            
+            // Fall back to local storage
+            grant.assigned = {
                 name: name,
                 date: new Date().toISOString()
             };
@@ -1716,8 +1947,8 @@
             showNotification(`Grant assigned to ${name}!`, 'success');
         }
         
-        // Unassign grant
-        function unassignGrant(index) {
+        // Modified unassignGrant function
+        async function unassignGrant(index) {
             const grant = fundingData[index];
             const currentUser = document.getElementById('teamMemberName').value.trim();
             
@@ -1728,12 +1959,108 @@
             }
             
             if (grant.assigned && grant.assigned.name === currentUser) {
-                fundingData[index].assigned = null;
+                // Save to Supabase if configured
+                if (isSupabaseConfigured() && grant.id) {
+                    const success = await saveAssignmentToSupabase(grant.id, null);
+                    if (success) {
+                        showNotification('Grant unassigned successfully!', 'success');
+                        await loadFromSupabase();
+                        renderTable();
+                        return;
+                    }
+                }
+                
+                // Fall back to local storage
+                grant.assigned = null;
                 saveAssignments();
                 renderTable();
                 showNotification('Grant unassigned successfully!', 'success');
             } else {
                 showNotification('You can only unassign grants assigned to you!', 'error');
+            }
+        }
+        
+        // Modified updateProgress function
+        async function updateProgress(index, status) {
+            const currentUser = document.getElementById('teamMemberName').value.trim();
+            const grant = fundingData[index];
+            
+            if (!currentUser) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                document.getElementById(`progress-${index}`).value = grant.progress.status;
+                return;
+            }
+            
+            if (grant.assigned && grant.assigned.name === currentUser) {
+                // Save to Supabase if configured
+                if (isSupabaseConfigured() && grant.id) {
+                    const success = await saveProgressToSupabase(
+                        grant.id, 
+                        status, 
+                        grant.progress.notes, 
+                        currentUser
+                    );
+                    if (success) {
+                        showNotification(`Progress updated to: ${status}`, 'success');
+                        await loadFromSupabase();
+                        renderTable();
+                        return;
+                    }
+                }
+                
+                // Fall back to local storage
+                grant.progress.status = status;
+                grant.progress.lastUpdated = new Date().toISOString();
+                saveAssignments();
+                
+                const selectElement = document.getElementById(`progress-${index}`);
+                selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+                
+                showNotification(`Progress updated to: ${status}`, 'success');
+                updateProgressStats();
+            } else {
+                showNotification('You can only update progress for grants assigned to you!', 'error');
+                document.getElementById(`progress-${index}`).value = grant.progress.status;
+            }
+        }
+        
+        // Modified saveNotes function
+        async function saveNotes(index) {
+            const currentUser = document.getElementById('teamMemberName').value.trim();
+            const grant = fundingData[index];
+            const notes = document.getElementById(`notes-${index}`).value;
+            
+            if (!currentUser) {
+                showNotification('Please enter your name first!', 'error');
+                document.getElementById('teamMemberName').focus();
+                return;
+            }
+            
+            if (grant.assigned && grant.assigned.name === currentUser) {
+                // Save to Supabase if configured
+                if (isSupabaseConfigured() && grant.id) {
+                    const success = await saveProgressToSupabase(
+                        grant.id,
+                        grant.progress.status,
+                        notes,
+                        currentUser
+                    );
+                    if (success) {
+                        showNotification('Notes saved successfully!', 'success');
+                        await loadFromSupabase();
+                        renderTable();
+                        return;
+                    }
+                }
+                
+                // Fall back to local storage
+                grant.progress.notes = notes;
+                grant.progress.lastUpdated = new Date().toISOString();
+                saveAssignments();
+                showNotification('Notes saved successfully!', 'success');
+            } else {
+                showNotification('You can only update notes for grants assigned to you!', 'error');
             }
         }
         
@@ -1881,7 +2208,7 @@
             let csv = [];
             
             // Get headers
-            const headers = ['Tier', 'Organization', 'Funding Amount', 'Type', 'Timeline', 'Priority', 'Contact', 'Assigned To', 'Assignment Date', 'Key Requirements'];
+            const headers = ['Tier', 'Organization', 'Funding Amount', 'Type', 'Timeline', 'Priority', 'Contact', 'Assigned To', 'Assignment Date', 'Progress Status', 'Last Updated', 'Notes', 'Key Requirements'];
             csv.push(headers.join(','));
             
             // Get data rows
@@ -1896,6 +2223,9 @@
                     `"${grant.contact.replace(/<[^>]*>/g, '')}"`,
                     `"${grant.assigned ? grant.assigned.name : 'Available'}"`,
                     `"${grant.assigned ? new Date(grant.assigned.date).toLocaleDateString() : ''}"`,
+                    `"${grant.progress ? grant.progress.status : 'Not Started'}"`,
+                    `"${grant.progress && grant.progress.lastUpdated ? new Date(grant.progress.lastUpdated).toLocaleDateString() : ''}"`,
+                    `"${grant.progress ? grant.progress.notes.replace(/"/g, '""') : ''}"`,
                     `"${grant.requirements}"`
                 ];
                 csv.push(rowData.join(','));
@@ -1924,15 +2254,24 @@
         });
         
         // Initialize on load
-        window.addEventListener('load', () => {
+        window.addEventListener('load', async () => {
+            // Check for Supabase configuration
+            if (isSupabaseConfigured()) {
+                showNotification('🌐 Connected to cloud database - Real-time sync enabled!', 'success');
+                await loadFromSupabase();
+                setupRealtimeUpdates();
+            } else {
+                showNotification('⚠️ Using local storage - Add Supabase credentials for team sync', 'error');
+                loadAssignments();
+            }
+            
             // Load saved name
             const savedName = localStorage.getItem('teamMemberName');
             if (savedName) {
                 document.getElementById('teamMemberName').value = savedName;
             }
             
-            // Load assignments and render table
-            loadAssignments();
+            // Render table
             renderTable();
             
             // Animate rows

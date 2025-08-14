@@ -919,7 +919,7 @@
             }
         }
         
-        // Load grants from Supabase
+       // Load grants from Supabase - WORKING VERSION WITH grant_details VIEW
         async function loadFromSupabase() {
             if (!isSupabaseConfigured()) {
                 loadAssignments(); // Fall back to local storage
@@ -927,6 +927,7 @@
             }
             
             try {
+                // Use the grant_details view that exists in your database
                 const { data, error } = await supabase
                     .from('grant_details')
                     .select('*')
@@ -964,7 +965,9 @@
                             }
                         });
                     });
-                    console.log('Loaded grants from Supabase');
+                    console.log(`Loaded ${data.length} grants from Supabase view`);
+                    updateStats();
+                    updateProgressStats();
                 } else {
                     // Initialize Supabase with existing data
                     await initializeSupabaseData();
@@ -974,12 +977,22 @@
                 loadAssignments(); // Fall back to local storage
             }
         }
-        
-        // Set up real-time subscription
+       // Set up real-time subscription - FIXED VERSION
         function setupRealtimeUpdates() {
             if (!isSupabaseConfigured()) return;
             
-            // Subscribe to assignment changes
+            // Subscribe to all three tables for changes
+            supabase
+                .channel('grants-channel')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'grants' },
+                    (payload) => {
+                        console.log('Grants change received:', payload);
+                        loadFromSupabase().then(() => renderTable());
+                    }
+                )
+                .subscribe();
+            
             supabase
                 .channel('assignments-channel')
                 .on('postgres_changes', 
@@ -991,7 +1004,6 @@
                 )
                 .subscribe();
             
-            // Subscribe to progress changes
             supabase
                 .channel('progress-channel')
                 .on('postgres_changes',
@@ -1003,7 +1015,7 @@
                 )
                 .subscribe();
                 
-            console.log('Real-time updates enabled');
+            console.log('Real-time updates enabled for all tables');
         }
         
         // Funding data with assignment tracking

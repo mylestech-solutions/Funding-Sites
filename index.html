@@ -2244,69 +2244,64 @@
             }
             
             if (grant.assigned && grant.assigned.name === currentUser) {
-                // Update in Supabase if configured
                 if (isSupabaseConfigured() && grant.id) {
                     try {
-                        // First, get current notes to preserve them
-                        const { data: currentProgress } = await supabase
-                            .from('progress')
-                            .select('notes')
-                            .eq('grant_id', grant.id)
-                            .single();
+                        console.log(`Updating progress for grant ${grant.id} to status: ${status}`);
                         
-                        const currentNotes = currentProgress?.notes || grant.progress.notes || '';
+                        // Get current notes to preserve them
+                        const currentNotes = document.getElementById(`notes-${index}`).value || grant.progress.notes || '';
                         
-                        // Update the progress record
+                        // Use upsert instead of update/insert
                         const { data, error } = await supabase
                             .from('progress')
-                            .update({
+                            .upsert({
+                                grant_id: grant.id,
                                 status: status,
                                 notes: currentNotes,
                                 updated_by: currentUser,
                                 last_updated: new Date().toISOString()
+                            }, {
+                                onConflict: 'grant_id'
                             })
-                            .eq('grant_id', grant.id)
                             .select();
                         
                         if (error) {
-                            // If update fails, try insert
-                            const { data: insertData, error: insertError } = await supabase
-                                .from('progress')
-                                .insert({
-                                    grant_id: grant.id,
-                                    status: status,
-                                    notes: currentNotes,
-                                    updated_by: currentUser,
-                                    last_updated: new Date().toISOString()
-                                })
-                                .select();
-                            
-                            if (insertError) {
-                                console.error('Progress error:', insertError);
-                                showNotification('Error updating progress: ' + insertError.message, 'error');
-                                document.getElementById(`progress-${index}`).value = grant.progress.status;
-                                return;
-                            }
-                            console.log('Progress created:', insertData);
-                        } else {
-                            console.log('Progress updated:', data);
+                            console.error('Progress update error:', error);
+                            showNotification('Error updating progress: ' + error.message, 'error');
+                            document.getElementById(`progress-${index}`).value = grant.progress.status;
+                            return;
                         }
                         
-                        showNotification(`Progress updated to: ${status} in database!`, 'success');
+                        console.log('Progress updated successfully:', data);
+                        showNotification(`Progress updated to: ${status} and saved!`, 'success');
                         
-                        // Update local data immediately
-                        grant.progress.status = status;
-                        grant.progress.lastUpdated = new Date().toISOString();
-                        grant.progress.updatedBy = currentUser;
+                        // Update local state immediately
+                        grant.progress = {
+                            status: status,
+                            notes: currentNotes,
+                            lastUpdated: new Date().toISOString(),
+                            updatedBy: currentUser
+                        };
                         
                         // Update UI
                         const selectElement = document.getElementById(`progress-${index}`);
                         if (selectElement) {
                             selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
                         }
-                        updateProgressStats();
                         
-                        // Don't reload entire table, just update local state
+                        // Update the date display
+                        const progressContainer = selectElement?.closest('.progress-container');
+                        let dateElement = progressContainer?.querySelector('.progress-date');
+                        if (!dateElement && progressContainer) {
+                            dateElement = document.createElement('div');
+                            dateElement.className = 'progress-date';
+                            selectElement.after(dateElement);
+                        }
+                        if (dateElement) {
+                            dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
+                        }
+                        
+                        updateProgressStats();
                         
                     } catch (err) {
                         console.error('Error updating progress:', err);
@@ -2316,7 +2311,7 @@
                     return;
                 }
                 
-                // Fall back to local storage
+                // Local storage fallback
                 grant.progress.status = status;
                 grant.progress.lastUpdated = new Date().toISOString();
                 saveAssignments();
@@ -2333,94 +2328,88 @@
         }
         
         // Modified saveNotes function - FIXED VERSION
-        async function saveNotes(index) {
-            const currentUser = document.getElementById('teamMemberName').value.trim();
-            const grant = fundingData[index];
-            const notes = document.getElementById(`notes-${index}`).value;
-            
-            if (!currentUser) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                return;
-            }
-            
-            if (grant.assigned && grant.assigned.name === currentUser) {
-                // Save to Supabase if configured
-                if (isSupabaseConfigured() && grant.id) {
-                    try {
-                        // Get current status to preserve it
-                        const { data: currentProgress } = await supabase
-                            .from('progress')
-                            .select('status')
-                            .eq('grant_id', grant.id)
-                            .single();
-                        
-                        const currentStatus = currentProgress?.status || grant.progress.status || 'Not Started';
-                        
-                        // Update the progress record with notes
-                        const { data, error } = await supabase
-                            .from('progress')
-                            .update({
-                                status: currentStatus,
-                                notes: notes,
-                                updated_by: currentUser,
-                                last_updated: new Date().toISOString()
-                            })
-                            .eq('grant_id', grant.id)
-                            .select();
-                        
-                        if (error) {
-                            // If update fails, try insert
-                            const { data: insertData, error: insertError } = await supabase
+            async function saveNotes(index) {
+                const currentUser = document.getElementById('teamMemberName').value.trim();
+                const grant = fundingData[index];
+                const notes = document.getElementById(`notes-${index}`).value;
+                
+                if (!currentUser) {
+                    showNotification('Please enter your name first!', 'error');
+                    document.getElementById('teamMemberName').focus();
+                    return;
+                }
+                
+                if (grant.assigned && grant.assigned.name === currentUser) {
+                    if (isSupabaseConfigured() && grant.id) {
+                        try {
+                            console.log(`Saving notes for grant ${grant.id}: "${notes}"`);
+                            
+                            // Get current status to preserve it
+                            const currentStatus = grant.progress.status || 'Not Started';
+                            
+                            // Use upsert instead of update/insert
+                            const { data, error } = await supabase
                                 .from('progress')
-                                .insert({
+                                .upsert({
                                     grant_id: grant.id,
                                     status: currentStatus,
                                     notes: notes,
                                     updated_by: currentUser,
                                     last_updated: new Date().toISOString()
+                                }, {
+                                    onConflict: 'grant_id'
                                 })
                                 .select();
                             
-                            if (insertError) {
-                                console.error('Notes error:', insertError);
-                                showNotification('Error saving notes: ' + insertError.message, 'error');
+                            if (error) {
+                                console.error('Notes save error:', error);
+                                showNotification('Error saving notes: ' + error.message, 'error');
                                 return;
                             }
-                            console.log('Notes created:', insertData);
-                        } else {
-                            console.log('Notes updated:', data);
+                            
+                            console.log('Notes saved successfully:', data);
+                            showNotification('Notes saved to database!', 'success');
+                            
+                            // Update local state immediately
+                            grant.progress = {
+                                status: currentStatus,
+                                notes: notes,
+                                lastUpdated: new Date().toISOString(),
+                                updatedBy: currentUser
+                            };
+                            
+                            // Update the date display
+                            const notesElement = document.getElementById(`notes-${index}`);
+                            const progressContainer = notesElement?.closest('.progress-container');
+                            let dateElement = progressContainer?.querySelector('.progress-date');
+                            if (!dateElement && progressContainer) {
+                                dateElement = document.createElement('div');
+                                dateElement.className = 'progress-date';
+                                const selectElement = progressContainer.querySelector('.progress-select');
+                                if (selectElement) {
+                                    selectElement.after(dateElement);
+                                }
+                            }
+                            if (dateElement) {
+                                dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
+                            }
+                            
+                        } catch (err) {
+                            console.error('Error saving notes:', err);
+                            showNotification('Error: ' + err.message, 'error');
                         }
-                        
-                        showNotification('Notes saved to database!', 'success');
-                        
-                        // Update local data immediately
-                        grant.progress.notes = notes;
-                        grant.progress.lastUpdated = new Date().toISOString();
-                        grant.progress.updatedBy = currentUser;
-                        
-                        // Update the displayed date
-                        const dateElement = document.querySelector(`#notes-${index}`).parentElement.previousElementSibling;
-                        if (dateElement && dateElement.classList.contains('progress-date')) {
-                            dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
-                        }
-                        
-                    } catch (err) {
-                        console.error('Error saving notes:', err);
-                        showNotification('Error: ' + err.message, 'error');
+                        return;
                     }
-                    return;
+                    
+                    // Local storage fallback
+                    grant.progress.notes = notes;
+                    grant.progress.lastUpdated = new Date().toISOString();
+                    saveAssignments();
+                    showNotification('Notes saved successfully!', 'success');
+                } else {
+                    showNotification('You can only update notes for grants assigned to you!', 'error');
                 }
-                
-                // Fall back to local storage
-                grant.progress.notes = notes;
-                grant.progress.lastUpdated = new Date().toISOString();
-                saveAssignments();
-                showNotification('Notes saved successfully!', 'success');
-            } else {
-                showNotification('You can only update notes for grants assigned to you!', 'error');
             }
-        }
         
         // Add function to mark grant as completed (optional)
         async function completeGrant(index) {

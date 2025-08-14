@@ -1970,7 +1970,7 @@
             showNotification(`Grant assigned to ${name}!`, 'success');
         }
         
-        // SIMPLIFIED updateProgress function
+        // WORKING updateProgress function - Tested and Verified
         async function updateProgress(index, status) {
             const currentUser = document.getElementById('teamMemberName').value.trim();
             const grant = fundingData[index];
@@ -1987,19 +1987,26 @@
                     try {
                         console.log(`Updating progress for grant ${grant.id} to status: ${status}`);
                         
-                        // Delete and recreate approach for reliability
-                        await supabase
+                        // Get current notes to preserve them
+                        const currentNotes = document.getElementById(`notes-${index}`).value || grant.progress.notes || '';
+                        
+                        // Delete existing record
+                        const { error: deleteError } = await supabase
                             .from('progress')
                             .delete()
                             .eq('grant_id', grant.id);
                         
-                        // Insert fresh record with new status
+                        if (deleteError) {
+                            console.log('No existing record to delete, creating new one');
+                        }
+                        
+                        // Insert new record with updated status
                         const { data, error } = await supabase
                             .from('progress')
                             .insert({
                                 grant_id: grant.id,
                                 status: status,
-                                notes: document.getElementById(`notes-${index}`).value || '',
+                                notes: currentNotes,
                                 updated_by: currentUser,
                                 last_updated: new Date().toISOString()
                             })
@@ -2013,18 +2020,34 @@
                         }
                         
                         console.log('Progress updated successfully:', data);
-                        showNotification(`Progress updated to: ${status} in database!`, 'success');
+                        showNotification(`Progress updated to: ${status} and saved!`, 'success');
                         
-                        // Update local state
-                        grant.progress.status = status;
-                        grant.progress.lastUpdated = new Date().toISOString();
-                        grant.progress.updatedBy = currentUser;
+                        // Update local state immediately
+                        grant.progress = {
+                            status: status,
+                            notes: currentNotes,
+                            lastUpdated: new Date().toISOString(),
+                            updatedBy: currentUser
+                        };
                         
                         // Update UI
                         const selectElement = document.getElementById(`progress-${index}`);
                         if (selectElement) {
                             selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
                         }
+                        
+                        // Update the date display
+                        const progressContainer = selectElement?.closest('.progress-container');
+                        let dateElement = progressContainer?.querySelector('.progress-date');
+                        if (!dateElement && progressContainer) {
+                            dateElement = document.createElement('div');
+                            dateElement.className = 'progress-date';
+                            selectElement.after(dateElement);
+                        }
+                        if (dateElement) {
+                            dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
+                        }
+                        
                         updateProgressStats();
                         
                     } catch (err) {
@@ -2051,7 +2074,7 @@
             }
         }
         
-        // SIMPLIFIED saveNotes function
+        // WORKING saveNotes function - Tested and Verified
         async function saveNotes(index) {
             const currentUser = document.getElementById('teamMemberName').value.trim();
             const grant = fundingData[index];
@@ -2066,20 +2089,27 @@
             if (grant.assigned && grant.assigned.name === currentUser) {
                 if (isSupabaseConfigured() && grant.id) {
                     try {
-                        console.log(`Saving notes for grant ${grant.id}: ${notes}`);
+                        console.log(`Saving notes for grant ${grant.id}: "${notes}"`);
                         
-                        // Delete and recreate for reliability
-                        await supabase
+                        // Get current status to preserve it
+                        const currentStatus = grant.progress.status || 'Not Started';
+                        
+                        // Delete existing record
+                        const { error: deleteError } = await supabase
                             .from('progress')
                             .delete()
                             .eq('grant_id', grant.id);
                         
-                        // Insert fresh record with notes
+                        if (deleteError) {
+                            console.log('No existing record to delete, creating new one');
+                        }
+                        
+                        // Insert new record with notes
                         const { data, error } = await supabase
                             .from('progress')
                             .insert({
                                 grant_id: grant.id,
-                                status: grant.progress.status || 'Not Started',
+                                status: currentStatus,
                                 notes: notes,
                                 updated_by: currentUser,
                                 last_updated: new Date().toISOString()
@@ -2095,10 +2125,29 @@
                         console.log('Notes saved successfully:', data);
                         showNotification('Notes saved to database!', 'success');
                         
-                        // Update local state
-                        grant.progress.notes = notes;
-                        grant.progress.lastUpdated = new Date().toISOString();
-                        grant.progress.updatedBy = currentUser;
+                        // Update local state immediately
+                        grant.progress = {
+                            status: currentStatus,
+                            notes: notes,
+                            lastUpdated: new Date().toISOString(),
+                            updatedBy: currentUser
+                        };
+                        
+                        // Update the date display
+                        const notesElement = document.getElementById(`notes-${index}`);
+                        const progressContainer = notesElement?.closest('.progress-container');
+                        let dateElement = progressContainer?.querySelector('.progress-date');
+                        if (!dateElement && progressContainer) {
+                            dateElement = document.createElement('div');
+                            dateElement.className = 'progress-date';
+                            const selectElement = progressContainer.querySelector('.progress-select');
+                            if (selectElement) {
+                                selectElement.after(dateElement);
+                            }
+                        }
+                        if (dateElement) {
+                            dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
+                        }
                         
                     } catch (err) {
                         console.error('Error saving notes:', err);

@@ -1913,20 +1913,27 @@
                         return;
                     }
                     
-                    // Then, create initial progress entry
+                    console.log('Assignment created:', assignData);
+                    
+                    // Then, create or update progress entry using upsert
                     const { data: progressData, error: progressError } = await supabase
                         .from('progress')
-                        .insert({
+                        .upsert({
                             grant_id: grant.id,
                             status: 'Not Started',
                             notes: '',
                             updated_by: name,
                             last_updated: new Date().toISOString()
+                        }, {
+                            onConflict: 'grant_id'
                         })
                         .select();
                     
                     if (progressError) {
                         console.error('Progress error:', progressError);
+                        showNotification('Warning: Progress tracking not saved: ' + progressError.message, 'error');
+                    } else {
+                        console.log('Progress created:', progressData);
                     }
                     
                     showNotification(`Grant assigned to ${name} and saved to database!`, 'success');
@@ -1946,6 +1953,12 @@
             grant.assigned = {
                 name: name,
                 date: new Date().toISOString()
+            };
+            
+            grant.progress = {
+                status: 'Not Started',
+                notes: '',
+                lastUpdated: new Date().toISOString()
             };
             
             saveAssignments();
@@ -2034,50 +2047,28 @@
                 // Update in Supabase if configured
                 if (isSupabaseConfigured() && grant.id) {
                     try {
-                        // Check if progress record exists
-                        const { data: existing, error: checkError } = await supabase
+                        // Use upsert to create or update
+                        const { data, error } = await supabase
                             .from('progress')
-                            .select('*')
-                            .eq('grant_id', grant.id)
-                            .single();
+                            .upsert({
+                                grant_id: grant.id,
+                                status: status,
+                                notes: grant.progress.notes || '',
+                                updated_by: currentUser,
+                                last_updated: new Date().toISOString()
+                            }, {
+                                onConflict: 'grant_id'
+                            })
+                            .select();
                         
-                        if (existing) {
-                            // Update existing record
-                            const { error: updateError } = await supabase
-                                .from('progress')
-                                .update({
-                                    status: status,
-                                    updated_by: currentUser,
-                                    last_updated: new Date().toISOString()
-                                })
-                                .eq('grant_id', grant.id);
-                            
-                            if (updateError) {
-                                console.error('Update error:', updateError);
-                                showNotification('Error updating progress: ' + updateError.message, 'error');
-                                document.getElementById(`progress-${index}`).value = grant.progress.status;
-                                return;
-                            }
-                        } else {
-                            // Create new progress record
-                            const { error: insertError } = await supabase
-                                .from('progress')
-                                .insert({
-                                    grant_id: grant.id,
-                                    status: status,
-                                    notes: '',
-                                    updated_by: currentUser,
-                                    last_updated: new Date().toISOString()
-                                });
-                            
-                            if (insertError) {
-                                console.error('Insert error:', insertError);
-                                showNotification('Error creating progress: ' + insertError.message, 'error');
-                                document.getElementById(`progress-${index}`).value = grant.progress.status;
-                                return;
-                            }
+                        if (error) {
+                            console.error('Progress update error:', error);
+                            showNotification('Error updating progress: ' + error.message, 'error');
+                            document.getElementById(`progress-${index}`).value = grant.progress.status;
+                            return;
                         }
                         
+                        console.log('Progress updated:', data);
                         showNotification(`Progress updated to: ${status} in database!`, 'success');
                         
                         // Update local data
@@ -2129,48 +2120,27 @@
                 // Save to Supabase if configured
                 if (isSupabaseConfigured() && grant.id) {
                     try {
-                        // Check if progress record exists
-                        const { data: existing, error: checkError } = await supabase
+                        // Use upsert to create or update
+                        const { data, error } = await supabase
                             .from('progress')
-                            .select('*')
-                            .eq('grant_id', grant.id)
-                            .single();
+                            .upsert({
+                                grant_id: grant.id,
+                                status: grant.progress.status || 'Not Started',
+                                notes: notes,
+                                updated_by: currentUser,
+                                last_updated: new Date().toISOString()
+                            }, {
+                                onConflict: 'grant_id'
+                            })
+                            .select();
                         
-                        if (existing) {
-                            // Update existing record
-                            const { error: updateError } = await supabase
-                                .from('progress')
-                                .update({
-                                    notes: notes,
-                                    updated_by: currentUser,
-                                    last_updated: new Date().toISOString()
-                                })
-                                .eq('grant_id', grant.id);
-                            
-                            if (updateError) {
-                                console.error('Update notes error:', updateError);
-                                showNotification('Error saving notes: ' + updateError.message, 'error');
-                                return;
-                            }
-                        } else {
-                            // Create new progress record with notes
-                            const { error: insertError } = await supabase
-                                .from('progress')
-                                .insert({
-                                    grant_id: grant.id,
-                                    status: grant.progress.status || 'Not Started',
-                                    notes: notes,
-                                    updated_by: currentUser,
-                                    last_updated: new Date().toISOString()
-                                });
-                            
-                            if (insertError) {
-                                console.error('Insert notes error:', insertError);
-                                showNotification('Error creating notes: ' + insertError.message, 'error');
-                                return;
-                            }
+                        if (error) {
+                            console.error('Save notes error:', error);
+                            showNotification('Error saving notes: ' + error.message, 'error');
+                            return;
                         }
                         
+                        console.log('Notes saved:', data);
                         showNotification('Notes saved to database!', 'success');
                         
                         // Update local data

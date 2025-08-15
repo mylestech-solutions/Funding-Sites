@@ -332,6 +332,13 @@
         .tier-6 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
         .tier-7 { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
         .tier-pan { background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #333; }
+        .tier-profit { 
+            background: linear-gradient(135deg, #00c9ff 0%, #92fe9d 100%); 
+            color: white; 
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0,201,255,0.4);
+            animation: pulse 2s infinite;
+        }
         
         .funding-amount {
             font-weight: 800;
@@ -775,8 +782,8 @@
         
         <div class="stats">
             <div class="stat-card">
-                <div class="stat-number">100+</div>
-                <div class="stat-label">Funding Sources</div>
+                <div class="stat-number">125+</div> <!-- Changed from 100+ -->
+                <div class="stat-label">For-Profit Funding Sources</div> <!-- Changed label -->
             </div>
             <div class="stat-card">
                 <div class="stat-number">$500M+</div>
@@ -1059,51 +1066,695 @@
                 requirements: 'All 54 AU states eligible',
                 assigned: null
             },
-            // Tier 1
+            // ============================================
+            // NEW FOR-PROFIT FUNDING OPPORTUNITIES
+            // Add these entries to the fundingData array
+            // ============================================
+            
+            // FOR-PROFIT SPECIFIC TIER
             {
-                tier: '1',
-                organization: 'UNICEF Innovation Fund',
-                amount: '$100,000',
-                type: 'Equity-Free Grant',
-                timeline: 'Rolling 2024-2025',
+                tier: 'FOR-PROFIT',
+                organization: 'AAIC Africa Healthcare Fund',
+                amount: '$5M - $20M',
+                type: 'Equity Investment',
+                timeline: 'Ongoing',
                 priority: 'TOP PRIORITY',
-                contact: '<a href="https://www.unicef.org/innovation" class="contact-link" target="_blank">Apply Here</a> | <a href="mailto:venturefund@unicef.org" class="contact-link">Email</a>',
-                requirements: 'All 54 African countries eligible',
-                assigned: null
+                contact: '<a href="https://aaicinvestment.com/" class="contact-link" target="_blank">Apply Here</a> | <a href="mailto:info@aaicinvestment.com" class="contact-link">Email</a>',
+                requirements: 'For-profit healthtech startups, 8+ African countries',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
             },
             {
-                tier: '1',
-                organization: 'USAID DIV',
-                amount: '$200K → $5M',
-                type: 'Tiered Grant',
+                tier: 'FOR-PROFIT',
+                organization: 'Health54 (CFAO Ventures)',
+                amount: '€250K - €5M',
+                type: 'Seed to Series B Equity',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://health54.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:contact@health54.com" class="contact-link">Email</a>',
+                requirements: 'For-profit health startups, 35+ African countries network',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Villgro Africa',
+                amount: '$50K - $500K',
+                type: 'Grants + Equity',
                 timeline: 'Rolling',
                 priority: 'HIGH',
-                contact: '<a href="https://www.usaid.gov/div" class="contact-link" target="_blank">Website</a> | <a href="mailto:div@usaid.gov" class="contact-link">Email</a>',
-                requirements: 'Pan-African = higher funding',
-                assigned: null
+                contact: '<a href="https://villgroafrica.org/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:info@villgroafrica.org" class="contact-link">Email</a>',
+                requirements: 'For-profit healthtech, East Africa focus, 3-year incubation',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
             },
             {
-                tier: '1',
-                organization: 'Gates Foundation Grand Challenges',
-                amount: '$100K → $1M',
-                type: 'Innovation Grant',
-                timeline: 'Biannual',
+                tier: 'FOR-PROFIT',
+                organization: 'Jaza Rift Ventures',
+                amount: '$200K - $2M',
+                type: 'Early-stage VC',
+                timeline: 'Ongoing',
                 priority: 'HIGH',
-                contact: '<a href="https://gcgh.grandchallenges.org/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:grandchallenges@gatesfoundation.org" class="contact-link">Email</a>',
-                requirements: 'Continental solutions priority',
-                assigned: null
+                contact: '<a href="https://jazarift.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@jazarift.com" class="contact-link">Email</a>',
+                requirements: 'For-profit healthtech/medtech startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
             },
             {
-                tier: '1',
-                organization: 'Grand Challenges Africa',
-                amount: '$100K seed',
-                type: 'Innovation Grant',
-                timeline: 'April 24, 2025',
-                priority: 'URGENT',
-                contact: '<a href="https://www.aasciences.africa" class="contact-link" target="_blank">Apply</a> | <a href="mailto:gca@aasciences.africa" class="contact-link">Email</a>',
-                requirements: 'African Academy of Sciences',
-                assigned: null
+                tier: 'FOR-PROFIT',
+                organization: 'IFHA (Investment Funds for Health Africa)',
+                amount: '$5M - $20M',
+                type: 'Growth Equity',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://ifhafund.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@ifhafund.com" class="contact-link">Email</a>',
+                requirements: 'For-profit healthcare companies, €170M AUM',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
             },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'HealthCap Africa',
+                amount: '$250K - $2M',
+                type: 'Seed to Pre-Series A',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://healthcapafrica.com/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:contact@healthcapafrica.com" class="contact-link">Email</a>',
+                requirements: 'For-profit scalable healthtech solutions',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'i3 Initiative (Gates Foundation)',
+                amount: '$50K grant + support',
+                type: 'Grant + Acceleration',
+                timeline: 'Annual cohorts',
+                priority: 'HIGH',
+                contact: '<a href="https://i3program.org/" class="contact-link" target="_blank">i3 Program</a> | <a href="mailto:info@i3program.org" class="contact-link">Email</a>',
+                requirements: 'For-profit healthtech, $7M fund for 30 companies',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Vital Capital',
+                amount: '$10M - $30M',
+                type: 'Large-scale Investment',
+                timeline: 'Ongoing',
+                priority: 'MAJOR',
+                contact: '<a href="https://vitalcapital.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@vitalcapital.com" class="contact-link">Email</a>',
+                requirements: 'For-profit healthcare infrastructure',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'LeapFrog Investments',
+                amount: '$10M - $50M',
+                type: 'Growth-stage Funding',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://leapfroginvest.com/" class="contact-link" target="_blank">LeapFrog</a> | <a href="mailto:info@leapfroginvest.com" class="contact-link">Email</a>',
+                requirements: 'For-profit digital health platforms',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Africa Health Ventures',
+                amount: '$100K - $1M',
+                type: 'Pre-seed/Seed Equity',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://africahealthventures.com/" class="contact-link" target="_blank">AHV</a> | <a href="mailto:info@africahealthventures.com" class="contact-link">Email</a>',
+                requirements: 'For-profit early-stage health ventures, MVP required',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Michael & Susan Dell Foundation',
+                amount: '$100K - $1M',
+                type: 'Social Enterprise Funding',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://www.dell.org/" class="contact-link" target="_blank">Dell Foundation</a> | <a href="mailto:info@msdf.org" class="contact-link">Email</a>',
+                requirements: 'For-profit social enterprises in health, India & South Africa',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Cisco Foundation Impact Investments',
+                amount: '$100K - $1M',
+                type: 'Impact Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.cisco.com/c/en/us/about/csr/impact/cisco-foundation.html" class="contact-link" target="_blank">Cisco Foundation</a> | <a href="mailto:foundation@cisco.com" class="contact-link">Email</a>',
+                requirements: 'For-profit tech-enabled health solutions',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Johnson & Johnson Innovation - JLABS',
+                amount: '$50K - $500K',
+                type: 'Innovation Awards + Investment',
+                timeline: 'Annual challenges',
+                priority: 'HIGH',
+                contact: '<a href="https://jnjinnovation.com/jlabs" class="contact-link" target="_blank">JLABS</a> | <a href="mailto:jlabs@its.jnj.com" class="contact-link">Email</a>',
+                requirements: 'For-profit healthcare innovators, Africa focus',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Shell LiveWIRE',
+                amount: '$5K - $100K',
+                type: 'Business Development Grant',
+                timeline: 'Annual programs',
+                priority: 'MEDIUM',
+                contact: '<a href="https://www.livewire.shell/" class="contact-link" target="_blank">LiveWIRE</a> | <a href="mailto:livewire@shell.com" class="contact-link">Email</a>',
+                requirements: 'For-profit youth entrepreneurs 18-35, health focus accepted',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Gilead Sciences Corporate Giving',
+                amount: '$25K - $500K',
+                type: 'Corporate Grants',
+                timeline: 'Year-round',
+                priority: 'HIGH',
+                contact: '<a href="https://www.gilead.com/responsibility/giving-at-gilead" class="contact-link" target="_blank">Gilead Giving</a> | <a href="mailto:grants@gilead.com" class="contact-link">Email</a>',
+                requirements: 'For-profit and nonprofit health programs in Africa',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'USAID DIV (Development Innovation Ventures)',
+                amount: '$200K → $15M',
+                type: 'Tiered Grant (accepts for-profits)',
+                timeline: 'Rolling',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.usaid.gov/div" class="contact-link" target="_blank">DIV Apply</a> | <a href="mailto:div@usaid.gov" class="contact-link">Email</a>',
+                requirements: 'For-profit social enterprises accepted, evidence-based',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Draper Richards Kaplan Foundation',
+                amount: '$300K over 3 years',
+                type: 'Unrestricted Grant',
+                timeline: 'Annual',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.drkfoundation.org/" class="contact-link" target="_blank">DRK Apply</a> | <a href="mailto:info@drkfoundation.org" class="contact-link">Email</a>',
+                requirements: 'For-profit social enterprises with proven model',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Skoll Foundation',
+                amount: '$1.5M over 3 years',
+                type: 'Skoll Award',
+                timeline: 'Annual',
+                priority: 'MAJOR',
+                contact: '<a href="https://skoll.org/skoll-awards/" class="contact-link" target="_blank">Skoll Awards</a> | <a href="mailto:info@skoll.org" class="contact-link">Email</a>',
+                requirements: 'For-profit social ventures, systems change focus',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'AWS Activate for Startups',
+                amount: '$100K cloud credits',
+                type: 'Technical Resources',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://aws.amazon.com/activate/" class="contact-link" target="_blank">AWS Activate</a> | <a href="mailto:aws-activate-support@amazon.com" class="contact-link">Email</a>',
+                requirements: 'For-profit startups, health tech solutions',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Microsoft for Startups',
+                amount: '$150K Azure credits',
+                type: 'Technical + Business Support',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://www.microsoft.com/startups" class="contact-link" target="_blank">MS Startups</a> | <a href="mailto:startups@microsoft.com" class="contact-link">Email</a>',
+                requirements: 'For-profit health tech startups, AI focus',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Google for Startups Accelerator Africa',
+                amount: '$100K equity-free + $200K credits',
+                type: 'Accelerator Program',
+                timeline: 'Annual cohorts',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://startup.google.com/accelerator/africa/" class="contact-link" target="_blank">Google Accelerator</a> | <a href="mailto:accelerator-africa@google.com" class="contact-link">Email</a>',
+                requirements: 'For-profit tech startups, health vertical included',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'META (Facebook) Accelerator',
+                amount: '$25K - $75K',
+                type: 'Accelerator + Technical Support',
+                timeline: 'Cohort-based',
+                priority: 'MEDIUM',
+                contact: '<a href="https://developers.facebook.com/accelerator/" class="contact-link" target="_blank">META Accelerator</a> | <a href="mailto:accelerator@meta.com" class="contact-link">Email</a>',
+                requirements: 'For-profit platforms, health communities focus',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Orange Ventures Africa',
+                amount: '€50K - €500K',
+                type: 'Seed Investment',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://ventures.orange.com/africa/" class="contact-link" target="_blank">Orange Ventures</a> | <a href="mailto:orange.ventures@orange.com" class="contact-link">Email</a>',
+                requirements: 'For-profit digital health, 17 African countries',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Seedstars Africa Ventures',
+                amount: '$250K - $2M',
+                type: 'Seed/Series A',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.seedstars.com/" class="contact-link" target="_blank">Seedstars</a> | <a href="mailto:africa@seedstars.com" class="contact-link">Email</a>',
+                requirements: 'For-profit emerging market startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Founders Factory Africa',
+                amount: '$250K investment',
+                type: 'Accelerator + Investment',
+                timeline: '6-month programs',
+                priority: 'HIGH',
+                contact: '<a href="https://foundersfactory.com/africa/" class="contact-link" target="_blank">FF Africa</a> | <a href="mailto:africa@foundersfactory.com" class="contact-link">Email</a>',
+                requirements: 'For-profit tech startups, healthtech vertical',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Y Combinator',
+                amount: '$500K',
+                type: 'Accelerator Investment',
+                timeline: 'Bi-annual (Winter/Summer)',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.ycombinator.com/apply" class="contact-link" target="_blank">YC Apply</a> | <a href="mailto:software@ycombinator.com" class="contact-link">Email</a>',
+                requirements: 'For-profit startups globally, health focus strong',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Techstars Africa',
+                amount: '$120K investment',
+                type: 'Accelerator Program',
+                timeline: 'Annual programs',
+                priority: 'HIGH',
+                contact: '<a href="https://www.techstars.com/" class="contact-link" target="_blank">Techstars</a> | <a href="mailto:africa@techstars.com" class="contact-link">Email</a>',
+                requirements: 'For-profit startups, ARM Labs Lagos program',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: '500 Global',
+                amount: '$150K',
+                type: 'Accelerator Investment',
+                timeline: 'Rolling',
+                priority: 'HIGH',
+                contact: '<a href="https://500.co/" class="contact-link" target="_blank">500 Global</a> | <a href="mailto:africa@500.co" class="contact-link">Email</a>',
+                requirements: 'For-profit early-stage startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Ventures Platform',
+                amount: '$50K - $250K',
+                type: 'Early-stage Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://venturesplatform.com/" class="contact-link" target="_blank">Ventures Platform</a> | <a href="mailto:hello@venturesplatform.com" class="contact-link">Email</a>',
+                requirements: 'For-profit Pan-African startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Launch Africa Ventures',
+                amount: '$100K - $300K',
+                type: 'Seed Investment',
+                timeline: 'Ongoing',
+                priority: 'MEDIUM',
+                contact: '<a href="https://launchafrica.vc/" class="contact-link" target="_blank">Launch Africa</a> | <a href="mailto:info@launchafrica.vc" class="contact-link">Email</a>',
+                requirements: 'For-profit B2B/B2B2C startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Microtraction',
+                amount: '$65K for 7% equity',
+                type: 'Pre-seed Investment',
+                timeline: 'Rolling',
+                priority: 'MEDIUM',
+                contact: '<a href="https://microtraction.com/" class="contact-link" target="_blank">Microtraction</a> | <a href="mailto:hello@microtraction.com" class="contact-link">Email</a>',
+                requirements: 'For-profit early-stage African startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Future Africa',
+                amount: '$50K - $1M',
+                type: 'Early-stage Capital',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://future.africa/" class="contact-link" target="_blank">Future Africa</a> | <a href="mailto:hello@future.africa" class="contact-link">Email</a>',
+                requirements: 'For-profit innovative startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Flat6Labs',
+                amount: '$100K - $500K',
+                type: 'Seed Investment',
+                timeline: 'Cohort-based',
+                priority: 'HIGH',
+                contact: '<a href="https://www.flat6labs.com/" class="contact-link" target="_blank">Flat6Labs</a> | <a href="mailto:info@flat6labs.com" class="contact-link">Email</a>',
+                requirements: 'For-profit MENA & Africa startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Catalyst Fund',
+                amount: '$100K - $200K',
+                type: 'Venture Building',
+                timeline: 'Annual cohorts',
+                priority: 'HIGH',
+                contact: '<a href="https://www.catalyst-fund.org/" class="contact-link" target="_blank">Catalyst Fund</a> | <a href="mailto:info@catalyst-fund.org" class="contact-link">Email</a>',
+                requirements: 'For-profit inclusive fintech & healthtech',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'GreenTec Capital',
+                amount: '$100K - $3M',
+                type: 'Venture Capital',
+                timeline: 'Ongoing',
+                priority: 'MEDIUM',
+                contact: '<a href="https://greentec-capital.com/" class="contact-link" target="_blank">GreenTec</a> | <a href="mailto:info@greentec-capital.com" class="contact-link">Email</a>',
+                requirements: 'For-profit African startups, impact focus',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Savannah Fund',
+                amount: '$250K - $500K',
+                type: 'Seed Capital',
+                timeline: 'Ongoing',
+                priority: 'MEDIUM',
+                contact: '<a href="https://savannah.vc/" class="contact-link" target="_blank">Savannah Fund</a> | <a href="mailto:info@savannah.vc" class="contact-link">Email</a>',
+                requirements: 'For-profit early-stage African startups',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Ingressive Capital',
+                amount: '$100K - $500K',
+                type: 'Pre-seed/Seed',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://ingressive.capital/" class="contact-link" target="_blank">Ingressive</a> | <a href="mailto:hello@ingressive.capital" class="contact-link">Email</a>',
+                requirements: 'For-profit tech-enabled startups in Africa',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            // Additional FOR-PROFIT opportunities to reach 50+
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'British International Investment (BII)',
+                amount: '$5M - $50M',
+                type: 'Debt/Equity Investment',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.bii.co.uk/" class="contact-link" target="_blank">BII Website</a> | <a href="mailto:enquiries@bii.co.uk" class="contact-link">Email</a>',
+                requirements: 'For-profit healthcare companies, £7.3bn portfolio',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'AfDB Private Sector Window',
+                amount: '$10M - $100M',
+                type: 'Private Sector Loans',
+                timeline: 'Ongoing',
+                priority: 'MAJOR',
+                contact: '<a href="https://www.afdb.org/en/topics-and-sectors/sectors/private-sector" class="contact-link" target="_blank">AfDB Private</a> | <a href="mailto:afdb@afdb.org" class="contact-link">Email</a>',
+                requirements: 'For-profit healthcare infrastructure projects',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Norsad Capital',
+                amount: '$1M - $10M',
+                type: 'Impact Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://norsadcapital.com/" class="contact-link" target="_blank">Norsad</a> | <a href="mailto:info@norsadcapital.com" class="contact-link">Email</a>',
+                requirements: 'For-profit SMEs in healthcare, SADC region',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Aureos Capital (Abraaj)',
+                amount: '$5M - $25M',
+                type: 'Private Equity',
+                timeline: 'Fund-based',
+                priority: 'HIGH',
+                contact: '<a href="mailto:info@aureoscapital.com" class="contact-link">Contact Email</a>',
+                requirements: 'For-profit healthcare providers in Africa',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'EIB Global (European Investment Bank)',
+                amount: '€5M - €50M',
+                type: 'Development Finance',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.eib.org/en/global/" class="contact-link" target="_blank">EIB Global</a> | <a href="mailto:info@eib.org" class="contact-link">Email</a>',
+                requirements: 'For-profit health infrastructure, climate-smart',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Swedfund',
+                amount: '$5M - $30M',
+                type: 'Development Capital',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.swedfund.se/en/" class="contact-link" target="_blank">Swedfund</a> | <a href="mailto:info@swedfund.se" class="contact-link">Email</a>',
+                requirements: 'For-profit sustainable businesses in Africa',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Norfund (Norwegian Investment Fund)',
+                amount: '$5M - $50M',
+                type: 'Equity/Loans',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.norfund.no/" class="contact-link" target="_blank">Norfund</a> | <a href="mailto:post@norfund.no" class="contact-link">Email</a>',
+                requirements: 'For-profit businesses, health sector included',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'FMO (Dutch Development Bank)',
+                amount: '€5M - €50M',
+                type: 'Development Finance',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://www.fmo.nl/" class="contact-link" target="_blank">FMO</a> | <a href="mailto:info@fmo.nl" class="contact-link">Email</a>',
+                requirements: 'For-profit private sector, health infrastructure',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Finnfund',
+                amount: '€1M - €20M',
+                type: 'Investment Loans/Equity',
+                timeline: 'Ongoing',
+                priority: 'MEDIUM',
+                contact: '<a href="https://www.finnfund.fi/" class="contact-link" target="_blank">Finnfund</a> | <a href="mailto:info@finnfund.fi" class="contact-link">Email</a>',
+                requirements: 'For-profit companies, developing countries',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'GroFin',
+                amount: '$100K - $1.5M',
+                type: 'Growth Finance',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.grofin.com/" class="contact-link" target="_blank">GroFin</a> | <a href="mailto:info@grofin.com" class="contact-link">Email</a>',
+                requirements: 'For-profit SMEs, business development support',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Acumen Fund',
+                amount: '$250K - $3M',
+                type: 'Patient Capital',
+                timeline: '5-7 year exits',
+                priority: 'HIGH',
+                contact: '<a href="https://acumen.org/" class="contact-link" target="_blank">Acumen</a> | <a href="mailto:info@acumen.org" class="contact-link">Email</a>',
+                requirements: 'For-profit social enterprises in health',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Kiva',
+                amount: '$5K - $100K',
+                type: '0% Interest Loans',
+                timeline: 'Rolling',
+                priority: 'MEDIUM',
+                contact: '<a href="https://www.kiva.org/" class="contact-link" target="_blank">Kiva.org</a> | <a href="mailto:contactus@kiva.org" class="contact-link">Email</a>',
+                requirements: 'For-profit social enterprises, crowdfunded',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Blue Haven Initiative',
+                amount: '$500K - $5M',
+                type: 'Impact Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://bluehaveninitiative.com/" class="contact-link" target="_blank">Blue Haven</a> | <a href="mailto:info@bluehaveninitiative.com" class="contact-link">Email</a>',
+                requirements: 'For-profit impact ventures, health focus',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Omidyar Network',
+                amount: '$500K - $10M',
+                type: 'Venture Investment',
+                timeline: 'Ongoing',
+                priority: 'TOP PRIORITY',
+                contact: '<a href="https://omidyar.com/" class="contact-link" target="_blank">Omidyar</a> | <a href="mailto:info@omidyar.com" class="contact-link">Email</a>',
+                requirements: 'For-profit tech platforms, health included',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Gray Matters Capital',
+                amount: '$100K - $2M',
+                type: 'Gender Lens Investment',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://graymatterscap.com/" class="contact-link" target="_blank">GMC</a> | <a href="mailto:info@graymatterscap.com" class="contact-link">Email</a>',
+                requirements: 'For-profit women-led health ventures',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'Soros Economic Development Fund',
+                amount: '$2M - $20M',
+                type: 'Development Finance',
+                timeline: 'Ongoing',
+                priority: 'HIGH',
+                contact: '<a href="https://www.opensocietyfoundations.org/who-we-are/programs/soros-economic-development-fund" class="contact-link" target="_blank">SEDF</a>',
+                requirements: 'For-profit social enterprises in Africa',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            },
+            {
+                tier: 'FOR-PROFIT',
+                organization: 'ResponsAbility',
+                amount: '$1M - $20M',
+                type: 'Impact Investment',
+                timeline: 'Ongoing',
+                priority: 'MEDIUM',
+                contact: '<a href="https://www.responsability.com/" class="contact-link" target="_blank">ResponsAbility</a> | <a href="mailto:info@responsability.com" class="contact-link">Email</a>',
+                requirements: 'For-profit healthcare providers',
+                assigned: null,
+                progress: { status: 'Not Started', notes: '', lastUpdated: null }
+            }
+                        // Tier 1
+            // {
+            //     tier: '1',
+            //     organization: 'UNICEF Innovation Fund',
+            //     amount: '$100,000',
+            //     type: 'Equity-Free Grant',
+            //     timeline: 'Rolling 2024-2025',
+            //     priority: 'TOP PRIORITY',
+            //     contact: '<a href="https://www.unicef.org/innovation" class="contact-link" target="_blank">Apply Here</a> | <a href="mailto:venturefund@unicef.org" class="contact-link">Email</a>',
+            //     requirements: 'All 54 African countries eligible',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '1',
+            //     organization: 'Gates Foundation Grand Challenges',
+            //     amount: '$100K → $1M',
+            //     type: 'Innovation Grant',
+            //     timeline: 'Biannual',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://gcgh.grandchallenges.org/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:grandchallenges@gatesfoundation.org" class="contact-link">Email</a>',
+            //     requirements: 'Continental solutions priority',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '1',
+            //     organization: 'Grand Challenges Africa',
+            //     amount: '$100K seed',
+            //     type: 'Innovation Grant',
+            //     timeline: 'April 24, 2025',
+            //     priority: 'URGENT',
+            //     contact: '<a href="https://www.aasciences.africa" class="contact-link" target="_blank">Apply</a> | <a href="mailto:gca@aasciences.africa" class="contact-link">Email</a>',
+            //     requirements: 'African Academy of Sciences',
+            //     assigned: null
+            // },
             {
                 tier: '1',
                 organization: 'Google Black Founders Fund',
@@ -1183,28 +1834,28 @@
                 assigned: null
             },
             // Tier 3
-            {
-                tier: '3',
-                organization: 'World Bank DE4A',
-                amount: '$25B by 2030',
-                type: 'Digital Economy Fund',
-                timeline: '2024-2030',
-                priority: 'MAJOR',
-                contact: '<a href="https://www.worldbank.org/" class="contact-link" target="_blank">Apply</a>',
-                requirements: 'Digital health infrastructure',
-                assigned: null
-            },
-            {
-                tier: '3',
-                organization: 'EU Global Gateway',
-                amount: '€10B Health',
-                type: 'Investment Package',
-                timeline: '2021-2027',
-                priority: 'HIGH',
-                contact: '<a href="https://ec.europa.eu/" class="contact-link" target="_blank">EU Delegations</a>',
-                requirements: '€150B total for Africa',
-                assigned: null
-            },
+            // {
+            //     tier: '3',
+            //     organization: 'World Bank DE4A',
+            //     amount: '$25B by 2030',
+            //     type: 'Digital Economy Fund',
+            //     timeline: '2024-2030',
+            //     priority: 'MAJOR',
+            //     contact: '<a href="https://www.worldbank.org/" class="contact-link" target="_blank">Apply</a>',
+            //     requirements: 'Digital health infrastructure',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '3',
+            //     organization: 'EU Global Gateway',
+            //     amount: '€10B Health',
+            //     type: 'Investment Package',
+            //     timeline: '2021-2027',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://ec.europa.eu/" class="contact-link" target="_blank">EU Delegations</a>',
+            //     requirements: '€150B total for Africa',
+            //     assigned: null
+            // },
             {
                 tier: '3',
                 organization: 'IFC Digital Health',
@@ -1239,28 +1890,28 @@
                 assigned: null
             },
             // Tier 4
-            {
-                tier: '4',
-                organization: 'AFD Fund for Innovation',
-                amount: '€100K - €3M',
-                type: 'Grant',
-                timeline: 'Rolling',
-                priority: 'High',
-                contact: '<a href="https://fundinnovation.dev/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:fisong@afd.fr" class="contact-link">Email</a>',
-                requirements: 'All 54 African countries',
-                assigned: null
-            },
-            {
-                tier: '4',
-                organization: 'AUDA-NEPAD',
-                amount: '$500K - $5M',
-                type: 'AU Grants',
-                timeline: 'Project-based',
-                priority: 'High',
-                contact: '<a href="https://www.nepad.org/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@nepad.org" class="contact-link">Email</a>',
-                requirements: 'Cross-border solutions',
-                assigned: null
-            },
+            // {
+            //     tier: '4',
+            //     organization: 'AFD Fund for Innovation',
+            //     amount: '€100K - €3M',
+            //     type: 'Grant',
+            //     timeline: 'Rolling',
+            //     priority: 'High',
+            //     contact: '<a href="https://fundinnovation.dev/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:fisong@afd.fr" class="contact-link">Email</a>',
+            //     requirements: 'All 54 African countries',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '4',
+            //     organization: 'AUDA-NEPAD',
+            //     amount: '$500K - $5M',
+            //     type: 'AU Grants',
+            //     timeline: 'Project-based',
+            //     priority: 'High',
+            //     contact: '<a href="https://www.nepad.org/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@nepad.org" class="contact-link">Email</a>',
+            //     requirements: 'Cross-border solutions',
+            //     assigned: null
+            // },
             // Tier 5
             {
                 tier: '5',
@@ -1329,39 +1980,39 @@
                 assigned: null
             },
             // Tier 6
-            {
-                tier: '6',
-                organization: 'Amref Health Africa',
-                amount: 'Up to $2M',
-                type: 'Co-investment',
-                timeline: 'Ongoing',
-                priority: 'High',
-                contact: '<a href="https://amref.org" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@amref.org" class="contact-link">Email</a>',
-                requirements: 'Largest African health NGO',
-                assigned: null
-            },
-            {
-                tier: '6',
-                organization: 'PATH Digital Square',
-                amount: '$15M+ initiative',
-                type: 'Technical Partnership',
-                timeline: 'Multi-year',
-                priority: 'High',
-                contact: '<a href="https://digitalsquare.org/" class="contact-link" target="_blank">Digital Square</a> | <a href="mailto:digitalsquare@path.org" class="contact-link">Email</a>',
-                requirements: 'Government integration',
-                assigned: null
-            },
-            {
-                tier: '6',
-                organization: 'CHAI Digital Health',
-                amount: '$50M Fund',
-                type: 'Partnership + Funding',
-                timeline: '2024-2027',
-                priority: 'High',
-                contact: '<a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@clintonhealthaccess.org" class="contact-link">Email</a>',
-                requirements: '28 African countries',
-                assigned: null
-            },
+            // {
+            //     tier: '6',
+            //     organization: 'Amref Health Africa',
+            //     amount: 'Up to $2M',
+            //     type: 'Co-investment',
+            //     timeline: 'Ongoing',
+            //     priority: 'High',
+            //     contact: '<a href="https://amref.org" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@amref.org" class="contact-link">Email</a>',
+            //     requirements: 'Largest African health NGO',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '6',
+            //     organization: 'PATH Digital Square',
+            //     amount: '$15M+ initiative',
+            //     type: 'Technical Partnership',
+            //     timeline: 'Multi-year',
+            //     priority: 'High',
+            //     contact: '<a href="https://digitalsquare.org/" class="contact-link" target="_blank">Digital Square</a> | <a href="mailto:digitalsquare@path.org" class="contact-link">Email</a>',
+            //     requirements: 'Government integration',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '6',
+            //     organization: 'CHAI Digital Health',
+            //     amount: '$50M Fund',
+            //     type: 'Partnership + Funding',
+            //     timeline: '2024-2027',
+            //     priority: 'High',
+            //     contact: '<a href="https://www.clintonhealthaccess.org" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@clintonhealthaccess.org" class="contact-link">Email</a>',
+            //     requirements: '28 African countries',
+            //     assigned: null
+            // },
             {
                 tier: '6',
                 organization: 'MTN Ambition 2025',
@@ -1385,28 +2036,28 @@
                 assigned: null
             },
             // Tier 7
-            {
-                tier: '7',
-                organization: 'M-Changa',
-                amount: '$1K - $500K',
-                type: 'Mobile Money Crowdfunding',
-                timeline: 'Campaign-based',
-                priority: 'Medium',
-                contact: '<a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a>',
-                requirements: 'Kenya, Uganda, Tanzania, Rwanda',
-                assigned: null
-            },
-            {
-                tier: '7',
-                organization: 'GlobalGiving',
-                amount: '$1K - $1M+',
-                type: 'Global Platform',
-                timeline: 'Ongoing',
-                priority: 'Low',
-                contact: '<a href="https://globalgiving.org" class="contact-link" target="_blank">globalgiving.org</a>',
-                requirements: '175+ countries coverage',
-                assigned: null
-            },
+            // {
+            //     tier: '7',
+            //     organization: 'M-Changa',
+            //     amount: '$1K - $500K',
+            //     type: 'Mobile Money Crowdfunding',
+            //     timeline: 'Campaign-based',
+            //     priority: 'Medium',
+            //     contact: '<a href="https://mchanga.africa" class="contact-link" target="_blank">mchanga.africa</a>',
+            //     requirements: 'Kenya, Uganda, Tanzania, Rwanda',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '7',
+            //     organization: 'GlobalGiving',
+            //     amount: '$1K - $1M+',
+            //     type: 'Global Platform',
+            //     timeline: 'Ongoing',
+            //     priority: 'Low',
+            //     contact: '<a href="https://globalgiving.org" class="contact-link" target="_blank">globalgiving.org</a>',
+            //     requirements: '175+ countries coverage',
+            //     assigned: null
+            // },
             // Additional High-Value Pan-African Grants
             {
                 tier: 'PAN-AF',
@@ -1419,17 +2070,17 @@
                 requirements: 'All 54 African countries, 12-week training',
                 assigned: null
             },
-            {
-                tier: 'PAN-AF',
-                organization: 'African Development Foundation',
-                amount: '$100K - $250K',
-                type: 'Direct Grant',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://www.usadf.gov" class="contact-link" target="_blank">USADF.gov</a> | <a href="mailto:info@usadf.gov" class="contact-link">Email</a>',
-                requirements: '31 African countries, grassroots focus',
-                assigned: null
-            },
+            // {
+            //     tier: 'PAN-AF',
+            //     organization: 'African Development Foundation',
+            //     amount: '$100K - $250K',
+            //     type: 'Direct Grant',
+            //     timeline: 'Rolling',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://www.usadf.gov" class="contact-link" target="_blank">USADF.gov</a> | <a href="mailto:info@usadf.gov" class="contact-link">Email</a>',
+            //     requirements: '31 African countries, grassroots focus',
+            //     assigned: null
+            // },
             {
                 tier: '1',
                 organization: 'Draper Richards Kaplan',
@@ -1463,17 +2114,17 @@
                 requirements: 'Global health focus, Africa priority',
                 assigned: null
             },
-            {
-                tier: '1',
-                organization: 'Conrad N. Hilton Foundation',
-                amount: '$500K - $2M',
-                type: 'Health Systems Grant',
-                timeline: 'Bi-annual',
-                priority: 'HIGH',
-                contact: '<a href="https://www.hiltonfoundation.org" class="contact-link" target="_blank">Hilton Foundation</a> | <a href="mailto:communications@hiltonfoundation.org" class="contact-link">Email</a>',
-                requirements: 'Sub-Saharan Africa health systems',
-                assigned: null
-            },
+            // {
+            //     tier: '1',
+            //     organization: 'Conrad N. Hilton Foundation',
+            //     amount: '$500K - $2M',
+            //     type: 'Health Systems Grant',
+            //     timeline: 'Bi-annual',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://www.hiltonfoundation.org" class="contact-link" target="_blank">Hilton Foundation</a> | <a href="mailto:communications@hiltonfoundation.org" class="contact-link">Email</a>',
+            //     requirements: 'Sub-Saharan Africa health systems',
+            //     assigned: null
+            // },
             {
                 tier: '2',
                 organization: 'Algebra Ventures',
@@ -1551,39 +2202,39 @@
                 requirements: 'China-Africa cooperation projects',
                 assigned: null
             },
-            {
-                tier: '4',
-                organization: 'Rockefeller Foundation',
-                amount: '$100K - $5M',
-                type: 'Program Grants',
-                timeline: 'Quarterly',
-                priority: 'HIGH',
-                contact: '<a href="https://www.rockefellerfoundation.org" class="contact-link" target="_blank">Rockefeller</a> | <a href="mailto:info@rockfound.org" class="contact-link">Email</a>',
-                requirements: 'Health equity in Africa',
-                assigned: null
-            },
-            {
-                tier: '4',
-                organization: 'Ford Foundation',
-                amount: '$200K - $2M',
-                type: 'Multi-year Grants',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://www.fordfoundation.org" class="contact-link" target="_blank">Ford Foundation</a> | <a href="mailto:office-secretary@fordfoundation.org" class="contact-link">Email</a>',
-                requirements: 'Social justice & equity focus',
-                assigned: null
-            },
-            {
-                tier: '4',
-                organization: 'MacArthur Foundation',
-                amount: '$500K - $10M',
-                type: '100&Change Award',
-                timeline: 'Every 3 years',
-                priority: 'MAJOR',
-                contact: '<a href="https://www.macfound.org" class="contact-link" target="_blank">MacArthur</a> | <a href="mailto:4answers@macfound.org" class="contact-link">Email</a>',
-                requirements: 'Bold solutions at scale',
-                assigned: null
-            },
+            // {
+            //     tier: '4',
+            //     organization: 'Rockefeller Foundation',
+            //     amount: '$100K - $5M',
+            //     type: 'Program Grants',
+            //     timeline: 'Quarterly',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://www.rockefellerfoundation.org" class="contact-link" target="_blank">Rockefeller</a> | <a href="mailto:info@rockfound.org" class="contact-link">Email</a>',
+            //     requirements: 'Health equity in Africa',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '4',
+            //     organization: 'Ford Foundation',
+            //     amount: '$200K - $2M',
+            //     type: 'Multi-year Grants',
+            //     timeline: 'Rolling',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://www.fordfoundation.org" class="contact-link" target="_blank">Ford Foundation</a> | <a href="mailto:office-secretary@fordfoundation.org" class="contact-link">Email</a>',
+            //     requirements: 'Social justice & equity focus',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '4',
+            //     organization: 'MacArthur Foundation',
+            //     amount: '$500K - $10M',
+            //     type: '100&Change Award',
+            //     timeline: 'Every 3 years',
+            //     priority: 'MAJOR',
+            //     contact: '<a href="https://www.macfound.org" class="contact-link" target="_blank">MacArthur</a> | <a href="mailto:4answers@macfound.org" class="contact-link">Email</a>',
+            //     requirements: 'Bold solutions at scale',
+            //     assigned: null
+            // },
             {
                 tier: '5',
                 organization: 'AWS Activate',
@@ -1628,39 +2279,39 @@
                 requirements: 'Commerce & communities focus',
                 assigned: null
             },
-            {
-                tier: '6',
-                organization: 'Aga Khan Foundation',
-                amount: '$100K - $5M',
-                type: 'Development Grants',
-                timeline: 'Multi-year',
-                priority: 'HIGH',
-                contact: '<a href="https://www.akdn.org" class="contact-link" target="_blank">AKDN.org</a> | <a href="mailto:info@akdn.org" class="contact-link">Email</a>',
-                requirements: '16 African countries presence',
-                assigned: null
-            },
-            {
-                tier: '6',
-                organization: 'Catholic Relief Services',
-                amount: '$50K - $2M',
-                type: 'Partnership Grants',
-                timeline: 'Project-based',
-                priority: 'Medium',
-                contact: '<a href="https://www.crs.org" class="contact-link" target="_blank">CRS.org</a> | <a href="mailto:info@crs.org" class="contact-link">Email</a>',
-                requirements: '40+ African countries',
-                assigned: null
-            },
-            {
-                tier: '6',
-                organization: 'Save the Children',
-                amount: '$100K - $3M',
-                type: 'Health Programs',
-                timeline: 'Annual',
-                priority: 'HIGH',
-                contact: '<a href="https://www.savethechildren.org" class="contact-link" target="_blank">Save Children</a> | <a href="mailto:info@savethechildren.org" class="contact-link">Email</a>',
-                requirements: 'Child health focus',
-                assigned: null
-            },
+            // {
+            //     tier: '6',
+            //     organization: 'Aga Khan Foundation',
+            //     amount: '$100K - $5M',
+            //     type: 'Development Grants',
+            //     timeline: 'Multi-year',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://www.akdn.org" class="contact-link" target="_blank">AKDN.org</a> | <a href="mailto:info@akdn.org" class="contact-link">Email</a>',
+            //     requirements: '16 African countries presence',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '6',
+            //     organization: 'Catholic Relief Services',
+            //     amount: '$50K - $2M',
+            //     type: 'Partnership Grants',
+            //     timeline: 'Project-based',
+            //     priority: 'Medium',
+            //     contact: '<a href="https://www.crs.org" class="contact-link" target="_blank">CRS.org</a> | <a href="mailto:info@crs.org" class="contact-link">Email</a>',
+            //     requirements: '40+ African countries',
+            //     assigned: null
+            // },
+            // {
+            //     tier: '6',
+            //     organization: 'Save the Children',
+            //     amount: '$100K - $3M',
+            //     type: 'Health Programs',
+            //     timeline: 'Annual',
+            //     priority: 'HIGH',
+            //     contact: '<a href="https://www.savethechildren.org" class="contact-link" target="_blank">Save Children</a> | <a href="mailto:info@savethechildren.org" class="contact-link">Email</a>',
+            //     requirements: 'Child health focus',
+            //     assigned: null
+            // },
             // Additional Impact Investors
             {
                 tier: '2',
@@ -1791,6 +2442,7 @@
         // Get tier badge class
         function getTierClass(tier) {
             if (tier === 'PAN-AF') return 'tier-pan';
+            if (tier === 'FOR-PROFIT') return 'tier-profit';
             return `tier-${tier}`;
         }
         

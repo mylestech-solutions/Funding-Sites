@@ -843,2260 +843,570 @@
         </div>
     </div>
     
-    <script>
-        // ============================================
-        // SUPABASE CONFIGURATION - MEDZEN HEALTH
-        // ============================================
-        const SUPABASE_URL = 'https://wgstbqsbgnjncartcbuq.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indnc3RicXNiZ25qbmNhcnRjYnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2MjY2NDAsImV4cCI6MjA3MDIwMjY0MH0.yUKf9vEQFTMojrUMoaL_MdsHV0-wURPBQ5muJwLi48Y';
-        
-        // Initialize Supabase client
-        let supabase;
-        if (SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL') {
-            const { createClient } = window.supabase;
-            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-        
-        // Check if Supabase is configured
-        function isSupabaseConfigured() {
-            return SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL' && supabase;
-        }
-        
-        // Initialize grants in Supabase (run once)
-        async function initializeSupabaseData() {
-            if (!isSupabaseConfigured()) {
-                console.log('Supabase not configured, using local storage');
+   <script>
+    // ============================================
+    // SUPABASE CONFIGURATION - MEDZEN HEALTH
+    // ============================================
+    const SUPABASE_URL = 'https://wgstbqsbgnjncartcbuq.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indnc3RicXNiZ25qbmNhcnRjYnVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2MjY2NDAsImV4cCI6MjA3MDIwMjY0MH0.yUKf9vEQFTMojrUMoaL_MdsHV0-wURPBQ5muJwLi48Y';
+    
+    // Initialize Supabase client
+    const { createClient } = window.supabase;
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // Initialize empty array - will be populated from database only
+    const fundingData = [];
+    
+    // Load data from Supabase
+    async function loadFromSupabase() {
+        try {
+            const { data, error } = await supabase
+                .from('grant_details')
+                .select('*')
+                .order('id');
+            
+            if (error) {
+                console.error('Error loading from Supabase:', error);
+                showNotification('Error loading data: ' + error.message, 'error');
                 return;
             }
             
-            try {
-                // Check if grants already exist
-                const { data: existingGrants, error: checkError } = await supabase
-                    .from('grants')
-                    .select('*')
-                    .limit(1);
-                
-                if (checkError) {
-                    console.error('Error checking grants:', checkError);
-                    return;
-                }
-                
-                if (existingGrants && existingGrants.length > 0) {
-                    console.log('Grants already initialized in Supabase');
-                    return;
-                }
-                
-                console.log('Initializing grants in database...');
-                
-                // Insert all grants in batches to avoid timeout
-                const grantsToInsert = fundingData.map(grant => ({
-                    tier: grant.tier || '',
-                    organization: grant.organization || '',
-                    amount: grant.amount || '',
-                    type: grant.type || '',
-                    timeline: grant.timeline || '',
-                    priority: grant.priority || '',
-                    contact: grant.contact || '',
-                    requirements: grant.requirements || ''
-                }));
-                
-                // Insert in batches of 10
-                for (let i = 0; i < grantsToInsert.length; i += 10) {
-                    const batch = grantsToInsert.slice(i, i + 10);
-                    const { data, error } = await supabase
-                        .from('grants')
-                        .insert(batch)
-                        .select();
-                    
-                    if (error) {
-                        console.error(`Error inserting batch ${i/10 + 1}:`, error);
-                    } else {
-                        console.log(`Inserted batch ${i/10 + 1} successfully`);
-                    }
-                }
-                
-                console.log('All grants initialized successfully');
-                showNotification('Database initialized with all grants!', 'success');
-                
-                // Reload data after initialization
-                await loadFromSupabase();
-                renderTable();
-            } catch (err) {
-                console.error('Error in initializeSupabaseData:', err);
-            }
-        }
-        
-
-        // Update the loadFromSupabase function to ensure progress is loaded correctly
-        async function loadFromSupabase() {
-            if (!isSupabaseConfigured()) {
-                loadAssignments();
-                return;
-            }
+            // Clear and repopulate fundingData array
+            fundingData.length = 0;
             
-            try {
-                const { data, error } = await supabase
-                    .from('grant_details')
-                    .select('*')
-                    .order('id');
-                
-                if (error) {
-                    console.error('Error loading from Supabase:', error);
-                    loadAssignments();
-                    return;
-                }
-                
-                if (data && data.length > 0) {
-                    fundingData.length = 0;
-                    data.forEach(grant => {
-                        fundingData.push({
-                            id: grant.id,
-                            tier: grant.tier,
-                            organization: grant.organization,
-                            amount: grant.amount,
-                            type: grant.type,
-                            timeline: grant.timeline,
-                            priority: grant.priority,
-                            contact: grant.contact,
-                            requirements: grant.requirements,
-                            assigned: grant.assigned_to ? {
-                                name: grant.assigned_to,
-                                date: grant.assigned_date
-                            } : null,
-                            progress: {
-                                status: grant.progress_status || 'Not Started',
-                                notes: grant.progress_notes || '',
-                                lastUpdated: grant.progress_updated,
-                                updatedBy: grant.updated_by
-                            }
-                        });
+            if (data && data.length > 0) {
+                data.forEach(grant => {
+                    fundingData.push({
+                        id: grant.id,
+                        tier: grant.tier,
+                        organization: grant.organization,
+                        amount: grant.amount,
+                        type: grant.type,
+                        timeline: grant.timeline,
+                        priority: grant.priority,
+                        contact: grant.contact,
+                        requirements: grant.requirements,
+                        assigned: grant.assigned_to ? {
+                            name: grant.assigned_to,
+                            date: grant.assigned_date
+                        } : null,
+                        progress: {
+                            status: grant.progress_status || 'Not Started',
+                            notes: grant.progress_notes || '',
+                            lastUpdated: grant.progress_updated,
+                            updatedBy: grant.updated_by
+                        }
                     });
-                    console.log(`Loaded ${data.length} grants from Supabase`);
-                    updateStats();
-                    updateProgressStats();
-                }
-            } catch (err) {
-                console.error('Error loading from Supabase:', err);
-                loadAssignments();
-            }
-        }
-       // Set up real-time subscription - FIXED VERSION
-        function setupRealtimeUpdates() {
-            if (!isSupabaseConfigured()) return;
-            
-            // Subscribe to all three tables for changes
-            supabase
-                .channel('grants-channel')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'grants' },
-                    (payload) => {
-                        console.log('Grants change received:', payload);
-                        loadFromSupabase().then(() => renderTable());
-                    }
-                )
-                .subscribe();
-            
-            supabase
-                .channel('assignments-channel')
-                .on('postgres_changes', 
-                    { event: '*', schema: 'public', table: 'assignments' },
-                    (payload) => {
-                        console.log('Assignment change received:', payload);
-                        loadFromSupabase().then(() => renderTable());
-                    }
-                )
-                .subscribe();
-            
-            supabase
-                .channel('progress-channel')
-                .on('postgres_changes',
-                    { event: '*', schema: 'public', table: 'progress' },
-                    (payload) => {
-                        console.log('Progress change received:', payload);
-                        loadFromSupabase().then(() => renderTable());
-                    }
-                )
-                .subscribe();
-                
-            console.log('Real-time updates enabled for all tables');
-        }
-        
-        // Funding data with assignment tracking
-        const fundingData = [
-            // PAN-AFRICAN SPECIFIC
-            {
-                tier: 'PAN-AF',
-                organization: 'Africa CDC Digital Health',
-                amount: '$100M Fund',
-                type: 'PPP Grants',
-                timeline: '2024-2030',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://africacdc.org" class="contact-link" target="_blank">Website</a> | <a href="mailto:digitalhealth@africacdc.org" class="contact-link">Email</a>',
-                requirements: 'Pan-African telemedicine focus',
-                assigned: null,
-                progress: {
-                    status: 'Not Started',
-                    notes: '',
-                    lastUpdated: null
-                }
-            },
-            {
-                tier: 'PAN-AF',
-                organization: 'Africa50 Infrastructure',
-                amount: '$10M - $100M',
-                type: 'Infrastructure Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.africa50.com" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@africa50.com" class="contact-link">Email</a>',
-                requirements: 'Min 3 countries required',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'PAN-AF',
-                organization: 'Afreximbank Healthcare',
-                amount: 'Up to $200M',
-                type: 'Equipment Facility',
-                timeline: '7-year loans',
-                priority: 'HIGH',
-                contact: '<a href="https://www.afreximbank.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@afreximbank.com" class="contact-link">Email</a>',
-                requirements: 'All 54 AU states eligible',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // ============================================
-            // NEW FOR-PROFIT FUNDING OPPORTUNITIES
-            // Add these entries to the fundingData array
-            // ============================================
-            
-            // FOR-PROFIT SPECIFIC TIER
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'AAIC Africa Healthcare Fund',
-                amount: '$5M - $20M',
-                type: 'Equity Investment',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://aaicinvestment.com/" class="contact-link" target="_blank">Apply Here</a> | <a href="mailto:info@aaicinvestment.com" class="contact-link">Email</a>',
-                requirements: 'For-profit healthtech startups, 8+ African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Health54 (CFAO Ventures)',
-                amount: '€250K - €5M',
-                type: 'Seed to Series B Equity',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://health54.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:contact@health54.com" class="contact-link">Email</a>',
-                requirements: 'For-profit health startups, 35+ African countries network',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Villgro Africa',
-                amount: '$50K - $500K',
-                type: 'Grants + Equity',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://villgroafrica.org/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:info@villgroafrica.org" class="contact-link">Email</a>',
-                requirements: 'For-profit healthtech, East Africa focus, 3-year incubation',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Jaza Rift Ventures',
-                amount: '$200K - $2M',
-                type: 'Early-stage VC',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://jazarift.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@jazarift.com" class="contact-link">Email</a>',
-                requirements: 'For-profit healthtech/medtech startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'IFHA (Investment Funds for Health Africa)',
-                amount: '$5M - $20M',
-                type: 'Growth Equity',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://ifhafund.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@ifhafund.com" class="contact-link">Email</a>',
-                requirements: 'For-profit healthcare companies, €170M AUM',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'HealthCap Africa',
-                amount: '$250K - $2M',
-                type: 'Seed to Pre-Series A',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://healthcapafrica.com/" class="contact-link" target="_blank">Apply</a> | <a href="mailto:contact@healthcapafrica.com" class="contact-link">Email</a>',
-                requirements: 'For-profit scalable healthtech solutions',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'i3 Initiative (Gates Foundation)',
-                amount: '$50K grant + support',
-                type: 'Grant + Acceleration',
-                timeline: 'Annual cohorts',
-                priority: 'HIGH',
-                contact: '<a href="https://i3program.org/" class="contact-link" target="_blank">i3 Program</a> | <a href="mailto:info@i3program.org" class="contact-link">Email</a>',
-                requirements: 'For-profit healthtech, $7M fund for 30 companies',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Vital Capital',
-                amount: '$10M - $30M',
-                type: 'Large-scale Investment',
-                timeline: 'Ongoing',
-                priority: 'MAJOR',
-                contact: '<a href="https://vitalcapital.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@vitalcapital.com" class="contact-link">Email</a>',
-                requirements: 'For-profit healthcare infrastructure',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'LeapFrog Investments',
-                amount: '$10M - $50M',
-                type: 'Growth-stage Funding',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://leapfroginvest.com/" class="contact-link" target="_blank">LeapFrog</a> | <a href="mailto:info@leapfroginvest.com" class="contact-link">Email</a>',
-                requirements: 'For-profit digital health platforms',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Africa Health Ventures',
-                amount: '$100K - $1M',
-                type: 'Pre-seed/Seed Equity',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://africahealthventures.com/" class="contact-link" target="_blank">AHV</a> | <a href="mailto:info@africahealthventures.com" class="contact-link">Email</a>',
-                requirements: 'For-profit early-stage health ventures, MVP required',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Michael & Susan Dell Foundation',
-                amount: '$100K - $1M',
-                type: 'Social Enterprise Funding',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://www.dell.org/" class="contact-link" target="_blank">Dell Foundation</a> | <a href="mailto:info@msdf.org" class="contact-link">Email</a>',
-                requirements: 'For-profit social enterprises in health, India & South Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Cisco Foundation Impact Investments',
-                amount: '$100K - $1M',
-                type: 'Impact Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.cisco.com/c/en/us/about/csr/impact/cisco-foundation.html" class="contact-link" target="_blank">Cisco Foundation</a> | <a href="mailto:foundation@cisco.com" class="contact-link">Email</a>',
-                requirements: 'For-profit tech-enabled health solutions',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Johnson & Johnson Innovation - JLABS',
-                amount: '$50K - $500K',
-                type: 'Innovation Awards + Investment',
-                timeline: 'Annual challenges',
-                priority: 'HIGH',
-                contact: '<a href="https://jnjinnovation.com/jlabs" class="contact-link" target="_blank">JLABS</a> | <a href="mailto:jlabs@its.jnj.com" class="contact-link">Email</a>',
-                requirements: 'For-profit healthcare innovators, Africa focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Shell LiveWIRE',
-                amount: '$5K - $100K',
-                type: 'Business Development Grant',
-                timeline: 'Annual programs',
-                priority: 'MEDIUM',
-                contact: '<a href="https://www.livewire.shell/" class="contact-link" target="_blank">LiveWIRE</a> | <a href="mailto:livewire@shell.com" class="contact-link">Email</a>',
-                requirements: 'For-profit youth entrepreneurs 18-35, health focus accepted',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Gilead Sciences Corporate Giving',
-                amount: '$25K - $500K',
-                type: 'Corporate Grants',
-                timeline: 'Year-round',
-                priority: 'HIGH',
-                contact: '<a href="https://www.gilead.com/responsibility/giving-at-gilead" class="contact-link" target="_blank">Gilead Giving</a> | <a href="mailto:grants@gilead.com" class="contact-link">Email</a>',
-                requirements: 'For-profit and nonprofit health programs in Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Skoll Foundation',
-                amount: '$1.5M over 3 years',
-                type: 'Skoll Award',
-                timeline: 'Annual',
-                priority: 'MAJOR',
-                contact: '<a href="https://skoll.org/skoll-awards/" class="contact-link" target="_blank">Skoll Awards</a> | <a href="mailto:info@skoll.org" class="contact-link">Email</a>',
-                requirements: 'For-profit social ventures, systems change focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'AWS Activate for Startups',
-                amount: '$100K cloud credits',
-                type: 'Technical Resources',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://aws.amazon.com/activate/" class="contact-link" target="_blank">AWS Activate</a> | <a href="mailto:aws-activate-support@amazon.com" class="contact-link">Email</a>',
-                requirements: 'For-profit startups, health tech solutions',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Microsoft for Startups',
-                amount: '$150K Azure credits',
-                type: 'Technical + Business Support',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://www.microsoft.com/startups" class="contact-link" target="_blank">MS Startups</a> | <a href="mailto:startups@microsoft.com" class="contact-link">Email</a>',
-                requirements: 'For-profit health tech startups, AI focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Google for Startups Accelerator Africa',
-                amount: '$100K equity-free + $200K credits',
-                type: 'Accelerator Program',
-                timeline: 'Annual cohorts',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://startup.google.com/accelerator/africa/" class="contact-link" target="_blank">Google Accelerator</a> | <a href="mailto:accelerator-africa@google.com" class="contact-link">Email</a>',
-                requirements: 'For-profit tech startups, health vertical included',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'META (Facebook) Accelerator',
-                amount: '$25K - $75K',
-                type: 'Accelerator + Technical Support',
-                timeline: 'Cohort-based',
-                priority: 'MEDIUM',
-                contact: '<a href="https://developers.facebook.com/accelerator/" class="contact-link" target="_blank">META Accelerator</a> | <a href="mailto:accelerator@meta.com" class="contact-link">Email</a>',
-                requirements: 'For-profit platforms, health communities focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Orange Ventures Africa',
-                amount: '€50K - €500K',
-                type: 'Seed Investment',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://ventures.orange.com/africa/" class="contact-link" target="_blank">Orange Ventures</a> | <a href="mailto:orange.ventures@orange.com" class="contact-link">Email</a>',
-                requirements: 'For-profit digital health, 17 African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Seedstars Africa Ventures',
-                amount: '$250K - $2M',
-                type: 'Seed/Series A',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.seedstars.com/" class="contact-link" target="_blank">Seedstars</a> | <a href="mailto:africa@seedstars.com" class="contact-link">Email</a>',
-                requirements: 'For-profit emerging market startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Founders Factory Africa',
-                amount: '$250K investment',
-                type: 'Accelerator + Investment',
-                timeline: '6-month programs',
-                priority: 'HIGH',
-                contact: '<a href="https://foundersfactory.com/africa/" class="contact-link" target="_blank">FF Africa</a> | <a href="mailto:africa@foundersfactory.com" class="contact-link">Email</a>',
-                requirements: 'For-profit tech startups, healthtech vertical',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Y Combinator',
-                amount: '$500K',
-                type: 'Accelerator Investment',
-                timeline: 'Bi-annual (Winter/Summer)',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://www.ycombinator.com/apply" class="contact-link" target="_blank">YC Apply</a> | <a href="mailto:software@ycombinator.com" class="contact-link">Email</a>',
-                requirements: 'For-profit startups globally, health focus strong',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Techstars Africa',
-                amount: '$120K investment',
-                type: 'Accelerator Program',
-                timeline: 'Annual programs',
-                priority: 'HIGH',
-                contact: '<a href="https://www.techstars.com/" class="contact-link" target="_blank">Techstars</a> | <a href="mailto:africa@techstars.com" class="contact-link">Email</a>',
-                requirements: 'For-profit startups, ARM Labs Lagos program',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: '500 Global',
-                amount: '$150K',
-                type: 'Accelerator Investment',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://500.co/" class="contact-link" target="_blank">500 Global</a> | <a href="mailto:africa@500.co" class="contact-link">Email</a>',
-                requirements: 'For-profit early-stage startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Ventures Platform',
-                amount: '$50K - $250K',
-                type: 'Early-stage Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://venturesplatform.com/" class="contact-link" target="_blank">Ventures Platform</a> | <a href="mailto:hello@venturesplatform.com" class="contact-link">Email</a>',
-                requirements: 'For-profit Pan-African startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Launch Africa Ventures',
-                amount: '$100K - $300K',
-                type: 'Seed Investment',
-                timeline: 'Ongoing',
-                priority: 'MEDIUM',
-                contact: '<a href="https://launchafrica.vc/" class="contact-link" target="_blank">Launch Africa</a> | <a href="mailto:info@launchafrica.vc" class="contact-link">Email</a>',
-                requirements: 'For-profit B2B/B2B2C startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Microtraction',
-                amount: '$65K for 7% equity',
-                type: 'Pre-seed Investment',
-                timeline: 'Rolling',
-                priority: 'MEDIUM',
-                contact: '<a href="https://microtraction.com/" class="contact-link" target="_blank">Microtraction</a> | <a href="mailto:hello@microtraction.com" class="contact-link">Email</a>',
-                requirements: 'For-profit early-stage African startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Future Africa',
-                amount: '$50K - $1M',
-                type: 'Early-stage Capital',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://future.africa/" class="contact-link" target="_blank">Future Africa</a> | <a href="mailto:hello@future.africa" class="contact-link">Email</a>',
-                requirements: 'For-profit innovative startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Flat6Labs',
-                amount: '$100K - $500K',
-                type: 'Seed Investment',
-                timeline: 'Cohort-based',
-                priority: 'HIGH',
-                contact: '<a href="https://www.flat6labs.com/" class="contact-link" target="_blank">Flat6Labs</a> | <a href="mailto:info@flat6labs.com" class="contact-link">Email</a>',
-                requirements: 'For-profit MENA & Africa startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Catalyst Fund',
-                amount: '$100K - $200K',
-                type: 'Venture Building',
-                timeline: 'Annual cohorts',
-                priority: 'HIGH',
-                contact: '<a href="https://www.catalyst-fund.org/" class="contact-link" target="_blank">Catalyst Fund</a> | <a href="mailto:info@catalyst-fund.org" class="contact-link">Email</a>',
-                requirements: 'For-profit inclusive fintech & healthtech',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'GreenTec Capital',
-                amount: '$100K - $3M',
-                type: 'Venture Capital',
-                timeline: 'Ongoing',
-                priority: 'MEDIUM',
-                contact: '<a href="https://greentec-capital.com/" class="contact-link" target="_blank">GreenTec</a> | <a href="mailto:info@greentec-capital.com" class="contact-link">Email</a>',
-                requirements: 'For-profit African startups, impact focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Savannah Fund',
-                amount: '$250K - $500K',
-                type: 'Seed Capital',
-                timeline: 'Ongoing',
-                priority: 'MEDIUM',
-                contact: '<a href="https://savannah.vc/" class="contact-link" target="_blank">Savannah Fund</a> | <a href="mailto:info@savannah.vc" class="contact-link">Email</a>',
-                requirements: 'For-profit early-stage African startups',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Ingressive Capital',
-                amount: '$100K - $500K',
-                type: 'Pre-seed/Seed',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://ingressive.capital/" class="contact-link" target="_blank">Ingressive</a> | <a href="mailto:hello@ingressive.capital" class="contact-link">Email</a>',
-                requirements: 'For-profit tech-enabled startups in Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Additional FOR-PROFIT opportunities to reach 50+
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'British International Investment (BII)',
-                amount: '$5M - $50M',
-                type: 'Debt/Equity Investment',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://www.bii.co.uk/" class="contact-link" target="_blank">BII Website</a> | <a href="mailto:enquiries@bii.co.uk" class="contact-link">Email</a>',
-                requirements: 'For-profit healthcare companies, £7.3bn portfolio',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'AfDB Private Sector Window',
-                amount: '$10M - $100M',
-                type: 'Private Sector Loans',
-                timeline: 'Ongoing',
-                priority: 'MAJOR',
-                contact: '<a href="https://www.afdb.org/en/topics-and-sectors/sectors/private-sector" class="contact-link" target="_blank">AfDB Private</a> | <a href="mailto:afdb@afdb.org" class="contact-link">Email</a>',
-                requirements: 'For-profit healthcare infrastructure projects',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Norsad Capital',
-                amount: '$1M - $10M',
-                type: 'Impact Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://norsadcapital.com/" class="contact-link" target="_blank">Norsad</a> | <a href="mailto:info@norsadcapital.com" class="contact-link">Email</a>',
-                requirements: 'For-profit SMEs in healthcare, SADC region',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Aureos Capital (Abraaj)',
-                amount: '$5M - $25M',
-                type: 'Private Equity',
-                timeline: 'Fund-based',
-                priority: 'HIGH',
-                contact: '<a href="mailto:info@aureoscapital.com" class="contact-link">Contact Email</a>',
-                requirements: 'For-profit healthcare providers in Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'EIB Global (European Investment Bank)',
-                amount: '€5M - €50M',
-                type: 'Development Finance',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://www.eib.org/en/global/" class="contact-link" target="_blank">EIB Global</a> | <a href="mailto:info@eib.org" class="contact-link">Email</a>',
-                requirements: 'For-profit health infrastructure, climate-smart',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Swedfund',
-                amount: '$5M - $30M',
-                type: 'Development Capital',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.swedfund.se/en/" class="contact-link" target="_blank">Swedfund</a> | <a href="mailto:info@swedfund.se" class="contact-link">Email</a>',
-                requirements: 'For-profit sustainable businesses in Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Norfund (Norwegian Investment Fund)',
-                amount: '$5M - $50M',
-                type: 'Equity/Loans',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.norfund.no/" class="contact-link" target="_blank">Norfund</a> | <a href="mailto:post@norfund.no" class="contact-link">Email</a>',
-                requirements: 'For-profit businesses, health sector included',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'FMO (Dutch Development Bank)',
-                amount: '€5M - €50M',
-                type: 'Development Finance',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://www.fmo.nl/" class="contact-link" target="_blank">FMO</a> | <a href="mailto:info@fmo.nl" class="contact-link">Email</a>',
-                requirements: 'For-profit private sector, health infrastructure',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Finnfund',
-                amount: '€1M - €20M',
-                type: 'Investment Loans/Equity',
-                timeline: 'Ongoing',
-                priority: 'MEDIUM',
-                contact: '<a href="https://www.finnfund.fi/" class="contact-link" target="_blank">Finnfund</a> | <a href="mailto:info@finnfund.fi" class="contact-link">Email</a>',
-                requirements: 'For-profit companies, developing countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'GroFin',
-                amount: '$100K - $1.5M',
-                type: 'Growth Finance',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.grofin.com/" class="contact-link" target="_blank">GroFin</a> | <a href="mailto:info@grofin.com" class="contact-link">Email</a>',
-                requirements: 'For-profit SMEs, business development support',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Acumen Fund',
-                amount: '$250K - $3M',
-                type: 'Patient Capital',
-                timeline: '5-7 year exits',
-                priority: 'HIGH',
-                contact: '<a href="https://acumen.org/" class="contact-link" target="_blank">Acumen</a> | <a href="mailto:info@acumen.org" class="contact-link">Email</a>',
-                requirements: 'For-profit social enterprises in health',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Kiva',
-                amount: '$5K - $100K',
-                type: '0% Interest Loans',
-                timeline: 'Rolling',
-                priority: 'MEDIUM',
-                contact: '<a href="https://www.kiva.org/" class="contact-link" target="_blank">Kiva.org</a> | <a href="mailto:contactus@kiva.org" class="contact-link">Email</a>',
-                requirements: 'For-profit social enterprises, crowdfunded',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Blue Haven Initiative',
-                amount: '$500K - $5M',
-                type: 'Impact Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://bluehaveninitiative.com/" class="contact-link" target="_blank">Blue Haven</a> | <a href="mailto:info@bluehaveninitiative.com" class="contact-link">Email</a>',
-                requirements: 'For-profit impact ventures, health focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Omidyar Network',
-                amount: '$500K - $10M',
-                type: 'Venture Investment',
-                timeline: 'Ongoing',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://omidyar.com/" class="contact-link" target="_blank">Omidyar</a> | <a href="mailto:info@omidyar.com" class="contact-link">Email</a>',
-                requirements: 'For-profit tech platforms, health included',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Gray Matters Capital',
-                amount: '$100K - $2M',
-                type: 'Gender Lens Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://graymatterscap.com/" class="contact-link" target="_blank">GMC</a> | <a href="mailto:info@graymatterscap.com" class="contact-link">Email</a>',
-                requirements: 'For-profit women-led health ventures',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'Soros Economic Development Fund',
-                amount: '$2M - $20M',
-                type: 'Development Finance',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.opensocietyfoundations.org/who-we-are/programs/soros-economic-development-fund" class="contact-link" target="_blank">SEDF</a>',
-                requirements: 'For-profit social enterprises in Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: 'FOR-PROFIT',
-                organization: 'ResponsAbility',
-                amount: '$1M - $20M',
-                type: 'Impact Investment',
-                timeline: 'Ongoing',
-                priority: 'MEDIUM',
-                contact: '<a href="https://www.responsability.com/" class="contact-link" target="_blank">ResponsAbility</a> | <a href="mailto:info@responsability.com" class="contact-link">Email</a>',
-                requirements: 'For-profit healthcare providers',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '1',
-                organization: 'Google Black Founders Fund',
-                amount: '$100K + $200K credits',
-                type: 'Equity-Free',
-                timeline: 'Q2 2025',
-                priority: 'HIGH',
-                contact: '<a href="https://startup.google.com" class="contact-link" target="_blank">Apply</a> | <a href="mailto:blackfoundersfund@google.com" class="contact-link">Email</a>',
-                requirements: 'All African countries eligible',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Tier 2
-            {
-                tier: '2',
-                organization: 'Partech Africa',
-                amount: '$500K - $5M',
-                type: 'Equity (Seed-Series B)',
-                timeline: 'Ongoing',
-                priority: 'TOP VC',
-                contact: '<a href="https://partechpartners.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:africa@partechpartners.com" class="contact-link">Email</a>',
-                requirements: '$143M fund, 20+ countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'TLcom Capital',
-                amount: '$500K - $15M',
-                type: 'Equity',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://tlcomcapital.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:hello@tlcomcapital.com" class="contact-link">Email</a>',
-                requirements: '$154M TIDE Africa Fund II',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Bamboo Capital Partners',
-                amount: '$500K - $10M',
-                type: 'Equity/Debt',
-                timeline: 'Ongoing',
-                priority: 'High',
-                contact: '<a href="https://bamboocp.com/" class="contact-link" target="_blank">Website</a> | <a href="mailto:info@bamboocp.com" class="contact-link">Email</a>',
-                requirements: '30+ African countries portfolio',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Acumen',
-                amount: '$100K - $3M',
-                type: 'Patient Capital',
-                timeline: '7-12 years',
-                priority: 'High',
-                contact: '<a href="https://acumen.org/" class="contact-link" target="_blank">acumen.org</a> | <a href="mailto:info@acumen.org" class="contact-link">Email</a>',
-                requirements: '20+ African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: '4DX Ventures',
-                amount: '$500K - $5M',
-                type: 'Equity',
-                timeline: 'Ongoing',
-                priority: 'Medium',
-                contact: '<a href="https://www.4dxventures.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@4dxventures.com" class="contact-link">Email</a>',
-                requirements: '$60M Fund II',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Novastar Ventures',
-                amount: '$1M - $15M',
-                type: 'Equity',
-                timeline: 'Ongoing',
-                priority: 'Medium',
-                contact: '<a href="https://www.novastarventures.com/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@novastarventures.com" class="contact-link">Email</a>',
-                requirements: '$200M Africa People+Planet Fund',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Tier 3
-            {
-                tier: '3',
-                organization: 'IFC Digital Health',
-                amount: '$5K - $10M',
-                type: 'Loans/Equity',
-                timeline: 'Rolling',
-                priority: 'High',
-                contact: '<a href="https://www.ifc.org/" class="contact-link" target="_blank">Website</a> | <a href="mailto:healthafrica@ifc.org" class="contact-link">Email</a>',
-                requirements: 'All African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '3',
-                organization: 'AfDB Health Initiative',
-                amount: '$3B over 10 years',
-                type: 'Loans/Grants',
-                timeline: '2024-2034',
-                priority: 'High',
-                contact: '<a href="https://www.afdb.org/" class="contact-link" target="_blank">Website</a> | <a href="mailto:afdb-healthsector@afdb.org" class="contact-link">Email</a>',
-                requirements: 'Africa Investment Forum access',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '3',
-                organization: 'Proparco Transform Health',
-                amount: '$111M Fund',
-                type: 'Blended Finance',
-                timeline: 'Ongoing',
-                priority: 'High',
-                contact: '<a href="https://www.proparco.fr/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:health@proparco.fr" class="contact-link">Email</a>',
-                requirements: '40+ African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Tier 5
-            {
-                tier: '5',
-                organization: 'Mastercard Foundation',
-                amount: '$200M Health Tech',
-                type: 'Young Africa Works',
-                timeline: '2024-2030',
-                priority: 'High',
-                contact: '<a href="https://mastercardfdn.org/" class="contact-link" target="_blank">Contact</a> | <a href="mailto:info@mastercardfdn.org" class="contact-link">Email</a>',
-                requirements: '35+ African countries, job creation',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'Orange Digital Centers',
-                amount: '€50K - €500K',
-                type: 'Accelerator + Investment',
-                timeline: 'Cohort-based',
-                priority: 'High',
-                contact: '<a href="https://ventures.orange.com" class="contact-link" target="_blank">Digital Centers</a> | <a href="mailto:orange.ventures@orange.com" class="contact-link">Email</a>',
-                requirements: '17 African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'Microsoft AI for Health',
-                amount: '$10K - $100K',
-                type: 'Azure Credits + Grant',
-                timeline: 'Quarterly',
-                priority: 'Medium',
-                contact: '<a href="https://www.microsoft.com/" class="contact-link" target="_blank">AI for Health</a> | <a href="mailto:aiforhealth@microsoft.com" class="contact-link">Email</a>',
-                requirements: 'Africa-led projects priority',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'J&J Africa Innovation',
-                amount: '$50,000',
-                type: 'Competition',
-                timeline: 'Annual',
-                priority: 'Medium',
-                contact: '<a href="https://jnjinnovation.com/" class="contact-link" target="_blank">J&J Africa</a>',
-                requirements: 'All African countries eligible',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'MEST Africa',
-                amount: '$100K investment',
-                type: 'Accelerator + Seed',
-                timeline: '12 months',
-                priority: 'High',
-                contact: '<a href="https://mest.io/" class="contact-link" target="_blank">MEST.io</a> | <a href="mailto:info@meltwater.org" class="contact-link">Email</a>',
-                requirements: 'Ghana, Nigeria, Kenya, SA, Senegal',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'Norrsken House',
-                amount: 'Access to $200M+',
-                type: 'Hub + Network',
-                timeline: 'Ongoing',
-                priority: 'High',
-                contact: '<a href="https://www.norrskenhouse.org/" class="contact-link" target="_blank">Foundation</a> | <a href="mailto:info@norrskenhouse.org" class="contact-link">Email</a>',
-                requirements: 'East & West Africa hubs',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Tier 6
-            {
-                tier: '6',
-                organization: 'MTN Ambition 2025',
-                amount: '$1B Digital Services',
-                type: 'Partnership',
-                timeline: '2021-2025',
-                priority: 'Medium',
-                contact: '<a href="https://www.mtn.com/" class="contact-link" target="_blank">Innovation Hub</a>',
-                requirements: '19 African markets',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '6',
-                organization: 'Safaricom M-TIBA',
-                amount: 'Partnership',
-                type: 'Health Wallet Integration',
-                timeline: 'Ongoing',
-                priority: 'Medium',
-                contact: '<a href="https://www.safaricom.co.ke/" class="contact-link" target="_blank">Partnerships</a>',
-                requirements: 'East Africa expansion',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Additional High-Value Pan-African Grants
-            {
-                tier: 'PAN-AF',
-                organization: 'Tony Elumelu Foundation',
-                amount: '$5,000 seed',
-                type: 'Entrepreneurship Grant',
-                timeline: 'Annual - Q1',
-                priority: 'HIGH',
-                contact: '<a href="https://www.tonyelumelufoundation.org" class="contact-link" target="_blank">TEF Apply</a> | <a href="mailto:info@tonyelumelufoundation.org" class="contact-link">Email</a>',
-                requirements: 'All 54 African countries, 12-week training',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '1',
-                organization: 'Draper Richards Kaplan',
-                amount: '$300K over 3 years',
-                type: 'Unrestricted Grant',
-                timeline: 'Annual',
-                priority: 'TOP PRIORITY',
-                contact: '<a href="https://www.drkfoundation.org" class="contact-link" target="_blank">Apply DRK</a> | <a href="mailto:info@drkfoundation.org" class="contact-link">Email</a>',
-                requirements: 'Global, scaling social enterprises',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Algebra Ventures',
-                amount: '$500K - $2M',
-                type: 'Seed/Series A',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://algebraventures.com" class="contact-link" target="_blank">Algebra VC</a> | <a href="mailto:info@algebraventures.com" class="contact-link">Email</a>',
-                requirements: 'Egypt + expansion to Africa',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Sawari Ventures',
-                amount: '$500K - $5M',
-                type: 'Equity',
-                timeline: 'Ongoing',
-                priority: 'Medium',
-                contact: '<a href="https://sawariventures.com" class="contact-link" target="_blank">Sawari</a> | <a href="mailto:info@sawariventures.com" class="contact-link">Email</a>',
-                requirements: 'North Africa + Sub-Saharan',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Kepple Africa Ventures',
-                amount: '$100K - $2M',
-                type: 'Early Stage Equity',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://kepple.co.ug" class="contact-link" target="_blank">Kepple Africa</a> | <a href="mailto:info@kepple-africa.com" class="contact-link">Email</a>',
-                requirements: '12+ African countries portfolio',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'CRE Venture Capital',
-                amount: '$250K - $5M',
-                type: 'Seed to Series A',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.crevcap.com" class="contact-link" target="_blank">CRE VC</a> | <a href="mailto:info@crevcap.com" class="contact-link">Email</a>',
-                requirements: 'East & West Africa focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '3',
-                organization: 'JICA (Japan)',
-                amount: '$1M - $50M',
-                type: 'ODA Loans/Grants',
-                timeline: 'Annual cycles',
-                priority: 'HIGH',
-                contact: '<a href="https://www.jica.go.jp/english" class="contact-link" target="_blank">JICA English</a> | <a href="mailto:jicagp-info@jica.go.jp" class="contact-link">Email</a>',
-                requirements: 'TICAD priority countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '3',
-                organization: 'KfW Development Bank',
-                amount: '€5M - €100M',
-                type: 'Development Finance',
-                timeline: 'Project-based',
-                priority: 'HIGH',
-                contact: '<a href="https://www.kfw-entwicklungsbank.de" class="contact-link" target="_blank">KfW DEG</a> | <a href="mailto:info@kfw-entwicklungsbank.de" class="contact-link">Email</a>',
-                requirements: 'German development cooperation',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '3',
-                organization: 'China-Africa Development Fund',
-                amount: '$5M - $100M',
-                type: 'Equity/Debt',
-                timeline: 'Ongoing',
-                priority: 'MAJOR',
-                contact: '<a href="http://www.cadfund.com/en" class="contact-link" target="_blank">CAD Fund</a> | <a href="mailto:cadfund@cadfund.com" class="contact-link">Email</a>',
-                requirements: 'China-Africa cooperation projects',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'AWS Activate',
-                amount: '$100K credits',
-                type: 'Cloud Credits + Support',
-                timeline: 'Rolling',
-                priority: 'HIGH',
-                contact: '<a href="https://aws.amazon.com/activate" class="contact-link" target="_blank">AWS Activate</a> | <a href="mailto:aws-activate-support@amazon.com" class="contact-link">Email</a>',
-                requirements: 'Startups globally',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'IBM Digital Nation Africa',
-                amount: '$50K - $200K value',
-                type: 'Tech + Training',
-                timeline: 'Ongoing',
-                priority: 'Medium',
-                contact: '<a href="https://www.ibm.com/africa" class="contact-link" target="_blank">IBM Africa</a> | <a href="mailto:digitalnation@ibm.com" class="contact-link">Email</a>',
-                requirements: '15+ African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'Cisco Global Problem Solver',
-                amount: '$250K grand prize',
-                type: 'Competition',
-                timeline: 'Annual',
-                priority: 'HIGH',
-                contact: '<a href="https://cisco.innovationchallenge.com" class="contact-link" target="_blank">Cisco Challenge</a> | <a href="mailto:csr@cisco.com" class="contact-link">Email</a>',
-                requirements: 'Tech for social impact',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '5',
-                organization: 'META (Facebook) Accelerator',
-                amount: '$25K - $75K',
-                type: 'Accelerator Program',
-                timeline: 'Cohort-based',
-                priority: 'Medium',
-                contact: '<a href="https://developers.facebook.com/accelerator" class="contact-link" target="_blank">META Accelerator</a> | <a href="mailto:accelerator@meta.com" class="contact-link">Email</a>',
-                requirements: 'Commerce & communities focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Additional Impact Investors
-            {
-                tier: '2',
-                organization: 'Oikocredit',
-                amount: '€500K - €10M',
-                type: 'Impact Loans',
-                timeline: 'Ongoing',
-                priority: 'Medium',
-                contact: '<a href="https://www.oikocredit.coop" class="contact-link" target="_blank">Oikocredit</a> | <a href="mailto:info@oikocredit.org" class="contact-link">Email</a>',
-                requirements: '33 African countries',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Root Capital',
-                amount: '$50K - $2M',
-                type: 'Working Capital',
-                timeline: 'Rolling',
-                priority: 'Medium',
-                contact: '<a href="https://rootcapital.org" class="contact-link" target="_blank">Root Capital</a> | <a href="mailto:info@rootcapital.org" class="contact-link">Email</a>',
-                requirements: 'Agricultural value chains',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '2',
-                organization: 'Investisseurs & Partenaires',
-                amount: '€300K - €3M',
-                type: 'Impact Investment',
-                timeline: 'Ongoing',
-                priority: 'HIGH',
-                contact: '<a href="https://www.ietp.com" class="contact-link" target="_blank">I&P</a> | <a href="mailto:contact@ietp.com" class="contact-link">Email</a>',
-                requirements: 'Sub-Saharan SMEs',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            // Crowdfunding & Alternative Finance
-            {
-                tier: '7',
-                organization: 'Kiva',
-                amount: '$1K - $100K',
-                type: '0% Interest Loans',
-                timeline: 'Rolling',
-                priority: 'Medium',
-                contact: '<a href="https://www.kiva.org" class="contact-link" target="_blank">Kiva.org</a> | <a href="mailto:contactus@kiva.org" class="contact-link">Email</a>',
-                requirements: 'Global crowdfunded loans',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '7',
-                organization: 'GoFundMe',
-                amount: 'Unlimited',
-                type: 'Donation Crowdfunding',
-                timeline: 'Anytime',
-                priority: 'Low',
-                contact: '<a href="https://www.gofundme.com" class="contact-link" target="_blank">GoFundMe</a>',
-                requirements: 'Global platform',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            },
-            {
-                tier: '7',
-                organization: 'Indiegogo',
-                amount: 'Unlimited',
-                type: 'Reward/Equity Crowdfunding',
-                timeline: 'Campaign-based',
-                priority: 'Low',
-                contact: '<a href="https://www.indiegogo.com" class="contact-link" target="_blank">Indiegogo</a>',
-                requirements: 'Tech & innovation focus',
-                assigned: null,
-                progress: { status: 'Not Started', notes: '', lastUpdated: null }
-            }
-        ];
-        
-        // Load assignments from localStorage
-        function loadAssignments() {
-            const saved = localStorage.getItem('grantAssignments');
-            const savedProgress = localStorage.getItem('grantProgress');
-            
-            if (saved) {
-                const assignments = JSON.parse(saved);
-                fundingData.forEach((grant, index) => {
-                    if (assignments[index]) {
-                        grant.assigned = assignments[index];
-                    }
                 });
-            }
-            
-            if (savedProgress) {
-                const progress = JSON.parse(savedProgress);
-                fundingData.forEach((grant, index) => {
-                    if (progress[index]) {
-                        grant.progress = progress[index];
-                    } else {
-                        grant.progress = {
-                            status: 'Not Started',
-                            notes: '',
-                            lastUpdated: null
-                        };
-                    }
-                });
+                console.log(`Loaded ${data.length} grants from Supabase`);
             } else {
-                // Initialize progress for all grants
-                fundingData.forEach(grant => {
-                    grant.progress = {
-                        status: 'Not Started',
-                        notes: '',
-                        lastUpdated: null
-                    };
-                });
+                console.log('No grants found in database');
             }
-        }
-        
-        // Save assignments to localStorage
-        function saveAssignments() {
-            const assignments = {};
-            const progress = {};
-            
-            fundingData.forEach((grant, index) => {
-                if (grant.assigned) {
-                    assignments[index] = grant.assigned;
-                }
-                if (grant.progress) {
-                    progress[index] = grant.progress;
-                }
-            });
-            
-            localStorage.setItem('grantAssignments', JSON.stringify(assignments));
-            localStorage.setItem('grantProgress', JSON.stringify(progress));
-        }
-        
-        // Get tier badge class
-        function getTierClass(tier) {
-            if (tier === 'PAN-AF') return 'tier-pan';
-            if (tier === 'FOR-PROFIT') return 'tier-profit';
-            return `tier-${tier}`;
-        }
-        
-        // Get priority class
-        function getPriorityClass(priority) {
-            if (priority.includes('TOP') || priority.includes('URGENT') || priority.includes('HIGH') || priority.includes('MAJOR')) {
-                return 'priority-high';
-            }
-            return '';
-        }
-        
-        // Render table
-        function renderTable(data = fundingData) {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            
-            data.forEach((grant, index) => {
-                const row = document.createElement('tr');
-                if (grant.assigned) {
-                    row.classList.add('assigned');
-                }
-                
-                // Initialize progress if not exists
-                if (!grant.progress) {
-                    grant.progress = {
-                        status: 'Not Started',
-                        notes: '',
-                        lastUpdated: null
-                    };
-                }
-                
-                row.innerHTML = `
-                    <td><span class="tier-badge ${getTierClass(grant.tier)}">Tier ${grant.tier}</span></td>
-                    <td><strong>${grant.organization}</strong></td>
-                    <td><span class="funding-amount">${grant.amount}</span></td>
-                    <td>${grant.type}</td>
-                    <td><span class="timeline">${grant.timeline}</span></td>
-                    <td>${grant.priority.includes('TOP') || grant.priority.includes('URGENT') || grant.priority.includes('HIGH') || grant.priority.includes('MAJOR') ? 
-                        `<span class="${getPriorityClass(grant.priority)}">${grant.priority}</span>` : grant.priority}</td>
-                    <td>${grant.contact}</td>
-                    <td class="assignment-cell">
-                        <div class="assignment-container" id="assign-${index}">
-                            ${grant.assigned ? 
-                                `<div class="assigned-info">
-                                    <span class="assigned-to">${grant.assigned.name}</span>
-                                    <span class="assigned-date">${new Date(grant.assigned.date).toLocaleDateString()}</span>
-                                    <button class="unassign-btn" onclick="unassignGrant(${index})">Unassign</button>
-                                </div>` :
-                                `<button class="assign-btn" onclick="assignGrant(${index})">Assign to Me</button>`
-                            }
-                        </div>
-                    </td>
-                    <td class="progress-cell">
-                        <div class="progress-container">
-                            <select class="progress-select status-${grant.progress.status.toLowerCase().replace(/\s+/g, '-')}" 
-                                    id="progress-${index}" 
-                                    onchange="updateProgress(${index}, this.value)"
-                                    ${!grant.assigned ? 'disabled' : ''}>
-                                <option value="Not Started" ${grant.progress.status === 'Not Started' ? 'selected' : ''}>📋 Not Started</option>
-                                <option value="Researching" ${grant.progress.status === 'Researching' ? 'selected' : ''}>🔍 Researching</option>
-                                <option value="Preparing" ${grant.progress.status === 'Preparing' ? 'selected' : ''}>📝 Preparing</option>
-                                <option value="In Progress" ${grant.progress.status === 'In Progress' ? 'selected' : ''}>⚡ In Progress</option>
-                                <option value="Submitted" ${grant.progress.status === 'Submitted' ? 'selected' : ''}>✅ Submitted</option>
-                                <option value="Under Review" ${grant.progress.status === 'Under Review' ? 'selected' : ''}>👀 Under Review</option>
-                                <option value="Approved" ${grant.progress.status === 'Approved' ? 'selected' : ''}>🎉 Approved</option>
-                                <option value="Rejected" ${grant.progress.status === 'Rejected' ? 'selected' : ''}>❌ Rejected</option>
-                                <option value="Resubmitting" ${grant.progress.status === 'Resubmitting' ? 'selected' : ''}>🔄 Resubmitting</option>
-                                <option value="Not Available" ${grant.progress.status === 'Not Available' ? 'selected' : ''}>🚫 Not Available</option>
-                            </select>
-                            ${grant.progress.lastUpdated ? 
-                                `<div class="progress-date">Updated: ${new Date(grant.progress.lastUpdated).toLocaleDateString()}</div>` : ''}
-                            <div class="progress-notes">
-                                <textarea class="progress-notes-input" 
-                                          id="notes-${index}" 
-                                          placeholder="Add notes about this application..."
-                                          ${!grant.assigned ? 'disabled' : ''}>${grant.progress.notes || ''}</textarea>
-                                <button class="save-notes-btn" 
-                                        onclick="saveNotes(${index})"
-                                        ${!grant.assigned ? 'disabled' : ''}>Save Notes</button>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${grant.requirements}</td>
-                `;
-                
-                tbody.appendChild(row);
-            });
             
             updateStats();
             updateProgressStats();
+        } catch (err) {
+            console.error('Error loading from Supabase:', err);
+            showNotification('Error: ' + err.message, 'error');
         }
-        
-        // Update statistics
-        function updateStats() {
-            const total = fundingData.length;
-            const assigned = fundingData.filter(g => g.assigned).length;
-            const available = total - assigned;
+    }
+    
+    // Set up real-time subscription
+    function setupRealtimeUpdates() {
+        supabase
+            .channel('db-changes')
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'grants' },
+                () => {
+                    console.log('Grants changed, reloading...');
+                    loadFromSupabase().then(() => renderTable());
+                }
+            )
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'assignments' },
+                () => {
+                    console.log('Assignments changed, reloading...');
+                    loadFromSupabase().then(() => renderTable());
+                }
+            )
+            .on('postgres_changes',
+                { event: '*', schema: 'public', table: 'progress' },
+                () => {
+                    console.log('Progress changed, reloading...');
+                    loadFromSupabase().then(() => renderTable());
+                }
+            )
+            .subscribe();
             
-            document.getElementById('totalGrants').textContent = total;
-            document.getElementById('assignedGrants').textContent = assigned;
-            document.getElementById('availableGrants').textContent = available;
+        console.log('Real-time updates enabled');
+    }
+    
+    // Get tier badge class
+    function getTierClass(tier) {
+        if (tier === 'PAN-AF') return 'tier-pan';
+        if (tier === 'FOR-PROFIT') return 'tier-profit';
+        return `tier-${tier}`;
+    }
+    
+    // Get priority class
+    function getPriorityClass(priority) {
+        if (priority.includes('TOP') || priority.includes('URGENT') || priority.includes('HIGH') || priority.includes('MAJOR')) {
+            return 'priority-high';
         }
+        return '';
+    }
+    
+    // Render table
+    function renderTable(data = fundingData) {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
         
-        // Modified assignGrant function - Creates both assignment AND progress
-        async function assignGrant(index) {
-            const name = document.getElementById('teamMemberName').value.trim();
-            
-            if (!name) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                return;
+        data.forEach((grant, index) => {
+            const row = document.createElement('tr');
+            if (grant.assigned) {
+                row.classList.add('assigned');
             }
             
-            const grant = fundingData[index];
-            
-            // Save to Supabase if configured
-            if (isSupabaseConfigured() && grant.id) {
-                try {
-                    // First, create the assignment
-                    const { data: assignData, error: assignError } = await supabase
-                        .from('assignments')
-                        .insert({
-                            grant_id: grant.id,
-                            assigned_to: name,
-                            assigned_date: new Date().toISOString()
-                        })
-                        .select();
-                    
-                    if (assignError) {
-                        console.error('Assignment error:', assignError);
-                        showNotification('Error assigning grant: ' + assignError.message, 'error');
-                        return;
-                    }
-                    
-                    console.log('Assignment created:', assignData);
-                    
-                    // Delete any existing progress record first
-                    await supabase
-                        .from('progress')
-                        .delete()
-                        .eq('grant_id', grant.id);
-                    
-                    // Then create a fresh progress entry
-                    const { data: progressData, error: progressError } = await supabase
-                        .from('progress')
-                        .insert({
-                            grant_id: grant.id,
-                            status: 'Not Started',
-                            notes: '',
-                            updated_by: name,
-                            last_updated: new Date().toISOString()
-                        })
-                        .select();
-                    
-                    if (progressError) {
-                        console.error('Progress creation error:', progressError);
-                        // Don't fail the whole operation if progress fails
-                    } else {
-                        console.log('Progress created:', progressData);
-                    }
-                    
-                    showNotification(`Grant assigned to ${name} and saved to database!`, 'success');
-                    
-                    // Reload data from database
-                    await loadFromSupabase();
-                    renderTable();
-                    
-                } catch (err) {
-                    console.error('Error in assignment:', err);
-                    showNotification('Error: ' + err.message, 'error');
-                }
-                return;
-            }
-            
-            // Fall back to local storage if Supabase not configured
-            grant.assigned = {
-                name: name,
-                date: new Date().toISOString()
-            };
-            
-            grant.progress = {
-                status: 'Not Started',
-                notes: '',
-                lastUpdated: new Date().toISOString()
-            };
-            
-            saveAssignments();
-            renderTable();
-            showNotification(`Grant assigned to ${name}!`, 'success');
-        }
-        
-      // Fixed updateProgress function
-            async function updateProgress(index, status) {
-                const currentUser = document.getElementById('teamMemberName').value.trim();
-                const grant = fundingData[index];
-                
-                if (!currentUser) {
-                    showNotification('Please enter your name first!', 'error');
-                    document.getElementById('teamMemberName').focus();
-                    document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
-                    return;
-                }
-                
-                if (grant.assigned && grant.assigned.name === currentUser) {
-                    if (isSupabaseConfigured() && grant.id) {
-                        try {
-                            console.log(`Updating progress for grant ${grant.id} to status: ${status}`);
-                            
-                            // Get current notes from the textarea
-                            const currentNotes = document.getElementById(`notes-${index}`)?.value || '';
-                            
-                            // First check if a progress record exists
-                            const { data: existingProgress } = await supabase
-                                .from('progress')
-                                .select('*')
-                                .eq('grant_id', grant.id)
-                                .single();
-                            
-                            let result;
-                            if (existingProgress) {
-                                // Update existing record
-                                result = await supabase
-                                    .from('progress')
-                                    .update({
-                                        status: status,
-                                        notes: currentNotes,
-                                        updated_by: currentUser,
-                                        last_updated: new Date().toISOString()
-                                    })
-                                    .eq('grant_id', grant.id)
-                                    .select();
-                            } else {
-                                // Insert new record
-                                result = await supabase
-                                    .from('progress')
-                                    .insert({
-                                        grant_id: grant.id,
-                                        status: status,
-                                        notes: currentNotes,
-                                        updated_by: currentUser,
-                                        last_updated: new Date().toISOString()
-                                    })
-                                    .select();
-                            }
-                            
-                            if (result.error) {
-                                console.error('Progress update error:', result.error);
-                                showNotification('Error updating progress: ' + result.error.message, 'error');
-                                document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
-                                return;
-                            }
-                            
-                            console.log('Progress updated successfully:', result.data);
-                            showNotification(`Progress updated to: ${status} and saved!`, 'success');
-                            
-                            // Update local state
-                            grant.progress = {
-                                status: status,
-                                notes: currentNotes,
-                                lastUpdated: new Date().toISOString(),
-                                updatedBy: currentUser
-                            };
-                            
-                            // Update UI
-                            const selectElement = document.getElementById(`progress-${index}`);
-                            if (selectElement) {
-                                selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
-                            }
-                            
-                            updateProgressStats();
-                            
-                        } catch (err) {
-                            console.error('Error updating progress:', err);
-                            showNotification('Error: ' + err.message, 'error');
-                            document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
-                        }
-                    } else {
-                        // Local storage fallback
-                        grant.progress.status = status;
-                        grant.progress.lastUpdated = new Date().toISOString();
-                        saveAssignments();
-                        showNotification(`Progress updated to: ${status}`, 'success');
-                        updateProgressStats();
-                    }
-                } else {
-                    showNotification('You can only update progress for grants assigned to you!', 'error');
-                    document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
-                }
-            }
-            
-            // Fixed saveNotes function
-            async function saveNotes(index) {
-                const currentUser = document.getElementById('teamMemberName').value.trim();
-                const grant = fundingData[index];
-                const notes = document.getElementById(`notes-${index}`)?.value || '';
-                
-                if (!currentUser) {
-                    showNotification('Please enter your name first!', 'error');
-                    document.getElementById('teamMemberName').focus();
-                    return;
-                }
-                
-                if (grant.assigned && grant.assigned.name === currentUser) {
-                    if (isSupabaseConfigured() && grant.id) {
-                        try {
-                            console.log(`Saving notes for grant ${grant.id}: "${notes}"`);
-                            
-                            // Get current status
-                            const currentStatus = grant.progress?.status || 'Not Started';
-                            
-                            // Check if progress record exists
-                            const { data: existingProgress } = await supabase
-                                .from('progress')
-                                .select('*')
-                                .eq('grant_id', grant.id)
-                                .single();
-                            
-                            let result;
-                            if (existingProgress) {
-                                // Update existing record
-                                result = await supabase
-                                    .from('progress')
-                                    .update({
-                                        status: currentStatus,
-                                        notes: notes,
-                                        updated_by: currentUser,
-                                        last_updated: new Date().toISOString()
-                                    })
-                                    .eq('grant_id', grant.id)
-                                    .select();
-                            } else {
-                                // Insert new record
-                                result = await supabase
-                                    .from('progress')
-                                    .insert({
-                                        grant_id: grant.id,
-                                        status: currentStatus,
-                                        notes: notes,
-                                        updated_by: currentUser,
-                                        last_updated: new Date().toISOString()
-                                    })
-                                    .select();
-                            }
-                            
-                            if (result.error) {
-                                console.error('Notes save error:', result.error);
-                                showNotification('Error saving notes: ' + result.error.message, 'error');
-                                return;
-                            }
-                            
-                            console.log('Notes saved successfully:', result.data);
-                            showNotification('Notes saved to database!', 'success');
-                            
-                            // Update local state
-                            grant.progress = {
-                                ...grant.progress,
-                                notes: notes,
-                                lastUpdated: new Date().toISOString(),
-                                updatedBy: currentUser
-                            };
-                            
-                        } catch (err) {
-                            console.error('Error saving notes:', err);
-                            showNotification('Error: ' + err.message, 'error');
-                        }
-                    } else {
-                        // Local storage fallback
-                        grant.progress.notes = notes;
-                        grant.progress.lastUpdated = new Date().toISOString();
-                        saveAssignments();
-                        showNotification('Notes saved successfully!', 'success');
-                    }
-                } else {
-                    showNotification('You can only update notes for grants assigned to you!', 'error');
-                }
-            }
-        
-        // Modified unassignGrant function - DELETES from database
-        async function unassignGrant(index) {
-            const grant = fundingData[index];
-            const currentUser = document.getElementById('teamMemberName').value.trim();
-            
-            if (!currentUser) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                return;
-            }
-            
-            if (grant.assigned && grant.assigned.name === currentUser) {
-                // Delete from Supabase if configured
-                if (isSupabaseConfigured() && grant.id) {
-                    try {
-                        // Delete assignment record
-                        const { error: deleteAssignError } = await supabase
-                            .from('assignments')
-                            .delete()
-                            .eq('grant_id', grant.id);
-                        
-                        if (deleteAssignError) {
-                            console.error('Delete assignment error:', deleteAssignError);
-                            showNotification('Error removing assignment: ' + deleteAssignError.message, 'error');
-                            return;
-                        }
-                        
-                        // Delete progress record
-                        const { error: deleteProgressError } = await supabase
-                            .from('progress')
-                            .delete()
-                            .eq('grant_id', grant.id);
-                        
-                        if (deleteProgressError) {
-                            console.error('Delete progress error:', deleteProgressError);
-                        }
-                        
-                        showNotification('Assignment removed from database!', 'success');
-                        
-                        // Reload data from database
-                        await loadFromSupabase();
-                        renderTable();
-                        
-                    } catch (err) {
-                        console.error('Error removing assignment:', err);
-                        showNotification('Error: ' + err.message, 'error');
-                    }
-                    return;
-                }
-                
-                // Fall back to local storage
-                grant.assigned = null;
+            // Initialize progress if not exists
+            if (!grant.progress) {
                 grant.progress = {
                     status: 'Not Started',
                     notes: '',
                     lastUpdated: null
                 };
-                saveAssignments();
-                renderTable();
-                showNotification('Grant unassigned successfully!', 'success');
-            } else {
-                showNotification('You can only unassign grants assigned to you!', 'error');
-            }
-        }
-        
-        // Modified updateProgress function - FIXED VERSION
-        async function updateProgress(index, status) {
-            const currentUser = document.getElementById('teamMemberName').value.trim();
-            const grant = fundingData[index];
-            
-            if (!currentUser) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                document.getElementById(`progress-${index}`).value = grant.progress.status;
-                return;
             }
             
-            if (grant.assigned && grant.assigned.name === currentUser) {
-                if (isSupabaseConfigured() && grant.id) {
-                    try {
-                        console.log(`Updating progress for grant ${grant.id} to status: ${status}`);
-                        
-                        // Get current notes to preserve them
-                        const currentNotes = document.getElementById(`notes-${index}`).value || grant.progress.notes || '';
-                        
-                        // Use upsert instead of update/insert
-                        const { data, error } = await supabase
-                            .from('progress')
-                            .upsert({
-                                grant_id: grant.id,
-                                status: status,
-                                notes: currentNotes,
-                                updated_by: currentUser,
-                                last_updated: new Date().toISOString()
-                            }, {
-                                onConflict: 'grant_id'
-                            })
-                            .select();
-                        
-                        if (error) {
-                            console.error('Progress update error:', error);
-                            showNotification('Error updating progress: ' + error.message, 'error');
-                            document.getElementById(`progress-${index}`).value = grant.progress.status;
-                            return;
+            row.innerHTML = `
+                <td><span class="tier-badge ${getTierClass(grant.tier)}">Tier ${grant.tier}</span></td>
+                <td><strong>${grant.organization}</strong></td>
+                <td><span class="funding-amount">${grant.amount}</span></td>
+                <td>${grant.type}</td>
+                <td><span class="timeline">${grant.timeline}</span></td>
+                <td>${grant.priority.includes('TOP') || grant.priority.includes('URGENT') || grant.priority.includes('HIGH') || grant.priority.includes('MAJOR') ? 
+                    `<span class="${getPriorityClass(grant.priority)}">${grant.priority}</span>` : grant.priority}</td>
+                <td>${grant.contact}</td>
+                <td class="assignment-cell">
+                    <div class="assignment-container" id="assign-${index}">
+                        ${grant.assigned ? 
+                            `<div class="assigned-info">
+                                <span class="assigned-to">${grant.assigned.name}</span>
+                                <span class="assigned-date">${new Date(grant.assigned.date).toLocaleDateString()}</span>
+                                <button class="unassign-btn" onclick="unassignGrant(${index})">Unassign</button>
+                            </div>` :
+                            `<button class="assign-btn" onclick="assignGrant(${index})">Assign to Me</button>`
                         }
-                        
-                        console.log('Progress updated successfully:', data);
-                        showNotification(`Progress updated to: ${status} and saved!`, 'success');
-                        
-                        // Update local state immediately
-                        grant.progress = {
-                            status: status,
-                            notes: currentNotes,
-                            lastUpdated: new Date().toISOString(),
-                            updatedBy: currentUser
-                        };
-                        
-                        // Update UI
-                        const selectElement = document.getElementById(`progress-${index}`);
-                        if (selectElement) {
-                            selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
-                        }
-                        
-                        // Update the date display
-                        const progressContainer = selectElement?.closest('.progress-container');
-                        let dateElement = progressContainer?.querySelector('.progress-date');
-                        if (!dateElement && progressContainer) {
-                            dateElement = document.createElement('div');
-                            dateElement.className = 'progress-date';
-                            selectElement.after(dateElement);
-                        }
-                        if (dateElement) {
-                            dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
-                        }
-                        
-                        updateProgressStats();
-                        
-                    } catch (err) {
-                        console.error('Error updating progress:', err);
-                        showNotification('Error: ' + err.message, 'error');
-                        document.getElementById(`progress-${index}`).value = grant.progress.status;
-                    }
-                    return;
-                }
-                
-                // Local storage fallback
-                grant.progress.status = status;
-                grant.progress.lastUpdated = new Date().toISOString();
-                saveAssignments();
-                
-                const selectElement = document.getElementById(`progress-${index}`);
-                selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
-                
-                showNotification(`Progress updated to: ${status}`, 'success');
-                updateProgressStats();
-            } else {
-                showNotification('You can only update progress for grants assigned to you!', 'error');
-                document.getElementById(`progress-${index}`).value = grant.progress.status;
-            }
+                    </div>
+                </td>
+                <td class="progress-cell">
+                    <div class="progress-container">
+                        <select class="progress-select status-${grant.progress.status.toLowerCase().replace(/\s+/g, '-')}" 
+                                id="progress-${index}" 
+                                onchange="updateProgress(${index}, this.value)"
+                                ${!grant.assigned ? 'disabled' : ''}>
+                            <option value="Not Started" ${grant.progress.status === 'Not Started' ? 'selected' : ''}>📋 Not Started</option>
+                            <option value="Researching" ${grant.progress.status === 'Researching' ? 'selected' : ''}>🔍 Researching</option>
+                            <option value="Preparing" ${grant.progress.status === 'Preparing' ? 'selected' : ''}>📝 Preparing</option>
+                            <option value="In Progress" ${grant.progress.status === 'In Progress' ? 'selected' : ''}>⚡ In Progress</option>
+                            <option value="Submitted" ${grant.progress.status === 'Submitted' ? 'selected' : ''}>✅ Submitted</option>
+                            <option value="Under Review" ${grant.progress.status === 'Under Review' ? 'selected' : ''}>👀 Under Review</option>
+                            <option value="Approved" ${grant.progress.status === 'Approved' ? 'selected' : ''}>🎉 Approved</option>
+                            <option value="Rejected" ${grant.progress.status === 'Rejected' ? 'selected' : ''}>❌ Rejected</option>
+                            <option value="Resubmitting" ${grant.progress.status === 'Resubmitting' ? 'selected' : ''}>🔄 Resubmitting</option>
+                            <option value="Not Available" ${grant.progress.status === 'Not Available' ? 'selected' : ''}>🚫 Not Available</option>
+                        </select>
+                        ${grant.progress.lastUpdated ? 
+                            `<div class="progress-date">Updated: ${new Date(grant.progress.lastUpdated).toLocaleDateString()}</div>` : ''}
+                        <div class="progress-notes">
+                            <textarea class="progress-notes-input" 
+                                      id="notes-${index}" 
+                                      placeholder="Add notes about this application..."
+                                      ${!grant.assigned ? 'disabled' : ''}>${grant.progress.notes || ''}</textarea>
+                            <button class="save-notes-btn" 
+                                    onclick="saveNotes(${index})"
+                                    ${!grant.assigned ? 'disabled' : ''}>Save Notes</button>
+                        </div>
+                    </div>
+                </td>
+                <td>${grant.requirements}</td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+        
+        updateStats();
+        updateProgressStats();
+    }
+    
+    // Update statistics
+    function updateStats() {
+        const total = fundingData.length;
+        const assigned = fundingData.filter(g => g.assigned).length;
+        const available = total - assigned;
+        
+        document.getElementById('totalGrants').textContent = total;
+        document.getElementById('assignedGrants').textContent = assigned;
+        document.getElementById('availableGrants').textContent = available;
+    }
+    
+    // Assign grant to user
+    async function assignGrant(index) {
+        const name = document.getElementById('teamMemberName').value.trim();
+        
+        if (!name) {
+            showNotification('Please enter your name first!', 'error');
+            document.getElementById('teamMemberName').focus();
+            return;
         }
         
-        // Modified saveNotes function - FIXED VERSION
-            async function saveNotes(index) {
-                const currentUser = document.getElementById('teamMemberName').value.trim();
-                const grant = fundingData[index];
-                const notes = document.getElementById(`notes-${index}`).value;
-                
-                if (!currentUser) {
-                    showNotification('Please enter your name first!', 'error');
-                    document.getElementById('teamMemberName').focus();
-                    return;
-                }
-                
-                if (grant.assigned && grant.assigned.name === currentUser) {
-                    if (isSupabaseConfigured() && grant.id) {
-                        try {
-                            console.log(`Saving notes for grant ${grant.id}: "${notes}"`);
-                            
-                            // Get current status to preserve it
-                            const currentStatus = grant.progress.status || 'Not Started';
-                            
-                            // Use upsert instead of update/insert
-                            const { data, error } = await supabase
-                                .from('progress')
-                                .upsert({
-                                    grant_id: grant.id,
-                                    status: currentStatus,
-                                    notes: notes,
-                                    updated_by: currentUser,
-                                    last_updated: new Date().toISOString()
-                                }, {
-                                    onConflict: 'grant_id'
-                                })
-                                .select();
-                            
-                            if (error) {
-                                console.error('Notes save error:', error);
-                                showNotification('Error saving notes: ' + error.message, 'error');
-                                return;
-                            }
-                            
-                            console.log('Notes saved successfully:', data);
-                            showNotification('Notes saved to database!', 'success');
-                            
-                            // Update local state immediately
-                            grant.progress = {
-                                status: currentStatus,
-                                notes: notes,
-                                lastUpdated: new Date().toISOString(),
-                                updatedBy: currentUser
-                            };
-                            
-                            // Update the date display
-                            const notesElement = document.getElementById(`notes-${index}`);
-                            const progressContainer = notesElement?.closest('.progress-container');
-                            let dateElement = progressContainer?.querySelector('.progress-date');
-                            if (!dateElement && progressContainer) {
-                                dateElement = document.createElement('div');
-                                dateElement.className = 'progress-date';
-                                const selectElement = progressContainer.querySelector('.progress-select');
-                                if (selectElement) {
-                                    selectElement.after(dateElement);
-                                }
-                            }
-                            if (dateElement) {
-                                dateElement.textContent = `Updated: ${new Date().toLocaleDateString()}`;
-                            }
-                            
-                        } catch (err) {
-                            console.error('Error saving notes:', err);
-                            showNotification('Error: ' + err.message, 'error');
-                        }
-                        return;
-                    }
-                    
-                    // Local storage fallback
-                    grant.progress.notes = notes;
-                    grant.progress.lastUpdated = new Date().toISOString();
-                    saveAssignments();
-                    showNotification('Notes saved successfully!', 'success');
+        const grant = fundingData[index];
+        
+        if (!grant.id) {
+            showNotification('Invalid grant ID', 'error');
+            return;
+        }
+        
+        try {
+            // Create assignment
+            const { error: assignError } = await supabase
+                .from('assignments')
+                .insert({
+                    grant_id: grant.id,
+                    assigned_to: name,
+                    assigned_date: new Date().toISOString()
+                });
+            
+            if (assignError) {
+                if (assignError.code === '23505') {
+                    showNotification('This grant is already assigned!', 'error');
                 } else {
-                    showNotification('You can only update notes for grants assigned to you!', 'error');
+                    showNotification('Error assigning grant: ' + assignError.message, 'error');
                 }
-            }
-        
-        // Add function to mark grant as completed (optional)
-        async function completeGrant(index) {
-            const currentUser = document.getElementById('teamMemberName').value.trim();
-            const grant = fundingData[index];
-            
-            if (!currentUser) {
-                showNotification('Please enter your name first!', 'error');
                 return;
             }
             
-            if (grant.assigned && grant.assigned.name === currentUser) {
-                if (isSupabaseConfigured() && grant.id) {
-                    try {
-                        // Update progress to Approved/Completed
-                        const { error } = await supabase
-                            .from('progress')
-                            .update({
-                                status: 'Approved',
-                                updated_by: currentUser,
-                                last_updated: new Date().toISOString()
-                            })
-                            .eq('grant_id', grant.id);
-                        
-                        if (error) {
-                            showNotification('Error completing grant: ' + error.message, 'error');
-                            return;
-                        }
-                        
-                        showNotification('Grant marked as completed!', 'success');
-                        await loadFromSupabase();
-                        renderTable();
-                        
-                    } catch (err) {
-                        console.error('Error completing grant:', err);
-                        showNotification('Error: ' + err.message, 'error');
-                    }
-                }
-            } else {
-                showNotification('You can only complete grants assigned to you!', 'error');
+            // Create initial progress record
+            const { error: progressError } = await supabase
+                .from('progress')
+                .insert({
+                    grant_id: grant.id,
+                    status: 'Not Started',
+                    notes: '',
+                    updated_by: name,
+                    last_updated: new Date().toISOString()
+                });
+            
+            if (progressError && progressError.code !== '23505') {
+                console.error('Progress creation error:', progressError);
             }
+            
+            showNotification(`Grant assigned to ${name}!`, 'success');
+            await loadFromSupabase();
+            renderTable();
+            
+        } catch (err) {
+            console.error('Error in assignment:', err);
+            showNotification('Error: ' + err.message, 'error');
+        }
+    }
+    
+    // Unassign grant
+    async function unassignGrant(index) {
+        const grant = fundingData[index];
+        const currentUser = document.getElementById('teamMemberName').value.trim();
+        
+        if (!currentUser) {
+            showNotification('Please enter your name first!', 'error');
+            return;
         }
         
-        // Show notification
-        function showNotification(message, type) {
-            const existing = document.querySelector('.notification');
-            if (existing) {
-                existing.remove();
-            }
-            
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-        
-        // Update progress status
-        function updateProgress(index, status) {
-            const currentUser = document.getElementById('teamMemberName').value.trim();
-            const grant = fundingData[index];
-            
-            if (!currentUser) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                document.getElementById(`progress-${index}`).value = grant.progress.status;
-                return;
-            }
-            
-            if (grant.assigned && grant.assigned.name === currentUser) {
-                grant.progress.status = status;
-                grant.progress.lastUpdated = new Date().toISOString();
-                saveAssignments();
+        if (grant.assigned && grant.assigned.name === currentUser) {
+            try {
+                // Delete assignment
+                await supabase
+                    .from('assignments')
+                    .delete()
+                    .eq('grant_id', grant.id);
                 
-                // Update the select element's class
-                const selectElement = document.getElementById(`progress-${index}`);
-                selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+                // Delete progress
+                await supabase
+                    .from('progress')
+                    .delete()
+                    .eq('grant_id', grant.id);
+                
+                showNotification('Assignment removed!', 'success');
+                await loadFromSupabase();
+                renderTable();
+                
+            } catch (err) {
+                console.error('Error removing assignment:', err);
+                showNotification('Error: ' + err.message, 'error');
+            }
+        } else {
+            showNotification('You can only unassign grants assigned to you!', 'error');
+        }
+    }
+    
+    // Update progress
+    async function updateProgress(index, status) {
+        const currentUser = document.getElementById('teamMemberName').value.trim();
+        const grant = fundingData[index];
+        
+        if (!currentUser) {
+            showNotification('Please enter your name first!', 'error');
+            document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
+            return;
+        }
+        
+        if (grant.assigned && grant.assigned.name === currentUser) {
+            try {
+                const currentNotes = document.getElementById(`notes-${index}`)?.value || '';
+                
+                // Upsert progress record
+                const { error } = await supabase
+                    .from('progress')
+                    .upsert({
+                        grant_id: grant.id,
+                        status: status,
+                        notes: currentNotes,
+                        updated_by: currentUser,
+                        last_updated: new Date().toISOString()
+                    }, {
+                        onConflict: 'grant_id'
+                    });
+                
+                if (error) {
+                    showNotification('Error updating progress: ' + error.message, 'error');
+                    document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
+                    return;
+                }
                 
                 showNotification(`Progress updated to: ${status}`, 'success');
-                updateProgressStats();
-            } else {
-                showNotification('You can only update progress for grants assigned to you!', 'error');
-                document.getElementById(`progress-${index}`).value = grant.progress.status;
-            }
-        }
-        
-        // Save notes
-        function saveNotes(index) {
-            const currentUser = document.getElementById('teamMemberName').value.trim();
-            const grant = fundingData[index];
-            const notes = document.getElementById(`notes-${index}`).value;
-            
-            if (!currentUser) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                return;
-            }
-            
-            if (grant.assigned && grant.assigned.name === currentUser) {
-                grant.progress.notes = notes;
-                grant.progress.lastUpdated = new Date().toISOString();
-                saveAssignments();
-                showNotification('Notes saved successfully!', 'success');
-            } else {
-                showNotification('You can only update notes for grants assigned to you!', 'error');
-            }
-        }
-        
-        // Update progress statistics
-        function updateProgressStats() {
-            const statusCounts = {
-                'Not Started': 0,
-                'Researching': 0,
-                'Preparing': 0,
-                'In Progress': 0,
-                'Submitted': 0,
-                'Under Review': 0,
-                'Approved': 0,
-                'Rejected': 0,
-                'Resubmitting': 0,
-                'Not Available': 0
-            };
-            
-            fundingData.forEach(grant => {
-                if (grant.progress && grant.progress.status) {
-                    statusCounts[grant.progress.status]++;
+                
+                // Update UI immediately
+                const selectElement = document.getElementById(`progress-${index}`);
+                if (selectElement) {
+                    selectElement.className = `progress-select status-${status.toLowerCase().replace(/\s+/g, '-')}`;
                 }
-            });
-            
-            document.getElementById('notStartedCount').textContent = statusCounts['Not Started'];
-            document.getElementById('researchingCount').textContent = statusCounts['Researching'];
-            document.getElementById('preparingCount').textContent = statusCounts['Preparing'];
-            document.getElementById('submittedCount').textContent = statusCounts['Submitted'];
-            document.getElementById('underReviewCount').textContent = statusCounts['Under Review'];
-            document.getElementById('approvedCount').textContent = statusCounts['Approved'];
-            document.getElementById('notAvailableCount').textContent = statusCounts['Not Available'];
+                
+                updateProgressStats();
+                
+            } catch (err) {
+                console.error('Error updating progress:', err);
+                showNotification('Error: ' + err.message, 'error');
+            }
+        } else {
+            showNotification('You can only update progress for grants assigned to you!', 'error');
+            document.getElementById(`progress-${index}`).value = grant.progress.status || 'Not Started';
+        }
+    }
+    
+    // Save notes
+    async function saveNotes(index) {
+        const currentUser = document.getElementById('teamMemberName').value.trim();
+        const grant = fundingData[index];
+        const notes = document.getElementById(`notes-${index}`)?.value || '';
+        
+        if (!currentUser) {
+            showNotification('Please enter your name first!', 'error');
+            return;
         }
         
-        // Filter functions
-        function filterMyAssignments() {
-            const name = document.getElementById('teamMemberName').value.trim();
-            
-            if (!name) {
-                showNotification('Please enter your name first!', 'error');
-                document.getElementById('teamMemberName').focus();
-                return;
+        if (grant.assigned && grant.assigned.name === currentUser) {
+            try {
+                const currentStatus = grant.progress?.status || 'Not Started';
+                
+                // Upsert progress record
+                const { error } = await supabase
+                    .from('progress')
+                    .upsert({
+                        grant_id: grant.id,
+                        status: currentStatus,
+                        notes: notes,
+                        updated_by: currentUser,
+                        last_updated: new Date().toISOString()
+                    }, {
+                        onConflict: 'grant_id'
+                    });
+                
+                if (error) {
+                    showNotification('Error saving notes: ' + error.message, 'error');
+                    return;
+                }
+                
+                showNotification('Notes saved!', 'success');
+                
+            } catch (err) {
+                console.error('Error saving notes:', err);
+                showNotification('Error: ' + err.message, 'error');
             }
-            
-            const filtered = fundingData.filter(g => g.assigned && g.assigned.name === name);
-            
-            if (filtered.length === 0) {
-                showNotification('No grants assigned to you yet!', 'error');
-            } else {
-                renderTable(filtered);
-                showNotification(`Showing ${filtered.length} grant(s) assigned to ${name}`, 'success');
-            }
+        } else {
+            showNotification('You can only update notes for grants assigned to you!', 'error');
+        }
+    }
+    
+    // Show notification
+    function showNotification(message, type) {
+        const existing = document.querySelector('.notification');
+        if (existing) {
+            existing.remove();
         }
         
-        function filterAvailable() {
-            const filtered = fundingData.filter(g => !g.assigned);
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+    
+    // Update progress statistics
+    function updateProgressStats() {
+        const statusCounts = {
+            'Not Started': 0,
+            'Researching': 0,
+            'Preparing': 0,
+            'In Progress': 0,
+            'Submitted': 0,
+            'Under Review': 0,
+            'Approved': 0,
+            'Rejected': 0,
+            'Resubmitting': 0,
+            'Not Available': 0
+        };
+        
+        fundingData.forEach(grant => {
+            if (grant.progress && grant.progress.status) {
+                statusCounts[grant.progress.status]++;
+            }
+        });
+        
+        document.getElementById('notStartedCount').textContent = statusCounts['Not Started'];
+        document.getElementById('researchingCount').textContent = statusCounts['Researching'];
+        document.getElementById('preparingCount').textContent = statusCounts['Preparing'];
+        document.getElementById('submittedCount').textContent = statusCounts['Submitted'];
+        document.getElementById('underReviewCount').textContent = statusCounts['Under Review'];
+        document.getElementById('approvedCount').textContent = statusCounts['Approved'];
+        document.getElementById('notAvailableCount').textContent = statusCounts['Not Available'];
+    }
+    
+    // Filter functions
+    function filterMyAssignments() {
+        const name = document.getElementById('teamMemberName').value.trim();
+        
+        if (!name) {
+            showNotification('Please enter your name first!', 'error');
+            document.getElementById('teamMemberName').focus();
+            return;
+        }
+        
+        const filtered = fundingData.filter(g => g.assigned && g.assigned.name === name);
+        
+        if (filtered.length === 0) {
+            showNotification('No grants assigned to you yet!', 'error');
+        } else {
             renderTable(filtered);
-            showNotification(`Showing ${filtered.length} available grant(s)`, 'success');
+            showNotification(`Showing ${filtered.length} grant(s) assigned to ${name}`, 'success');
         }
+    }
+    
+    function filterAvailable() {
+        const filtered = fundingData.filter(g => !g.assigned);
+        renderTable(filtered);
+        showNotification(`Showing ${filtered.length} available grant(s)`, 'success');
+    }
+    
+    function filterByProgress(status) {
+        const filtered = fundingData.filter(g => g.progress && g.progress.status === status);
         
-        function filterByProgress(status) {
-            const filtered = fundingData.filter(g => g.progress && g.progress.status === status);
-            
-            if (filtered.length === 0) {
-                showNotification(`No grants with status: ${status}`, 'error');
-            } else {
-                renderTable(filtered);
-                showNotification(`Showing ${filtered.length} grant(s) with status: ${status}`, 'success');
-            }
+        if (filtered.length === 0) {
+            showNotification(`No grants with status: ${status}`, 'error');
+        } else {
+            renderTable(filtered);
+            showNotification(`Showing ${filtered.length} grant(s) with status: ${status}`, 'success');
         }
+    }
+    
+    function showAll() {
+        renderTable();
+        showNotification('Showing all grants', 'success');
+    }
+    
+    // Download table function
+    function downloadTable() {
+        let csv = [];
         
-        function showAll() {
-            renderTable();
-            showNotification('Showing all grants', 'success');
-        }
+        // Get headers
+        const headers = ['Tier', 'Organization', 'Funding Amount', 'Type', 'Timeline', 'Priority', 'Contact', 'Assigned To', 'Assignment Date', 'Progress Status', 'Last Updated', 'Notes', 'Key Requirements'];
+        csv.push(headers.join(','));
         
-        // Download table function
-        function downloadTable() {
-            const table = document.getElementById('fundingTable');
-            let csv = [];
-            
-            // Get headers
-            const headers = ['Tier', 'Organization', 'Funding Amount', 'Type', 'Timeline', 'Priority', 'Contact', 'Assigned To', 'Assignment Date', 'Progress Status', 'Last Updated', 'Notes', 'Key Requirements'];
-            csv.push(headers.join(','));
-            
-            // Get data rows
-            fundingData.forEach(grant => {
-                const rowData = [
-                    `"Tier ${grant.tier}"`,
-                    `"${grant.organization}"`,
-                    `"${grant.amount}"`,
-                    `"${grant.type}"`,
-                    `"${grant.timeline}"`,
-                    `"${grant.priority}"`,
-                    `"${grant.contact.replace(/<[^>]*>/g, '')}"`,
-                    `"${grant.assigned ? grant.assigned.name : 'Available'}"`,
-                    `"${grant.assigned ? new Date(grant.assigned.date).toLocaleDateString() : ''}"`,
-                    `"${grant.progress ? grant.progress.status : 'Not Started'}"`,
-                    `"${grant.progress && grant.progress.lastUpdated ? new Date(grant.progress.lastUpdated).toLocaleDateString() : ''}"`,
-                    `"${grant.progress ? grant.progress.notes.replace(/"/g, '""') : ''}"`,
-                    `"${grant.requirements}"`
-                ];
-                csv.push(rowData.join(','));
-            });
-            
-            // Create blob and download
-            const csvContent = csv.join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute('href', url);
-            link.setAttribute('download', 'MedZen_Health_Team_Grant_Assignments.csv');
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showNotification('Table downloaded successfully!', 'success');
-        }
-        
-        // Save team member name to localStorage
-        document.getElementById('teamMemberName').addEventListener('input', function() {
-            localStorage.setItem('teamMemberName', this.value);
+        // Get data rows
+        fundingData.forEach(grant => {
+            const rowData = [
+                `"Tier ${grant.tier}"`,
+                `"${grant.organization}"`,
+                `"${grant.amount}"`,
+                `"${grant.type}"`,
+                `"${grant.timeline}"`,
+                `"${grant.priority}"`,
+                `"${grant.contact.replace(/<[^>]*>/g, '')}"`,
+                `"${grant.assigned ? grant.assigned.name : 'Available'}"`,
+                `"${grant.assigned ? new Date(grant.assigned.date).toLocaleDateString() : ''}"`,
+                `"${grant.progress ? grant.progress.status : 'Not Started'}"`,
+                `"${grant.progress && grant.progress.lastUpdated ? new Date(grant.progress.lastUpdated).toLocaleDateString() : ''}"`,
+                `"${grant.progress ? grant.progress.notes.replace(/"/g, '""') : ''}"`,
+                `"${grant.requirements}"`
+            ];
+            csv.push(rowData.join(','));
         });
         
-        // Initialize on load
-        window.addEventListener('load', async () => {
-            // Check for Supabase configuration
-            if (isSupabaseConfigured()) {
-                showNotification('🌐 Connected to cloud database - Real-time sync enabled!', 'success');
-                await loadFromSupabase();
-                setupRealtimeUpdates();
-            } else {
-                showNotification('⚠️ Using local storage - Add Supabase credentials for team sync', 'error');
-                loadAssignments();
-            }
-            
-            // Load saved name
-            const savedName = localStorage.getItem('teamMemberName');
-            if (savedName) {
-                document.getElementById('teamMemberName').value = savedName;
-            }
-            
-            // Render table
-            renderTable();
-            
-            // Animate rows
-            const rows = document.querySelectorAll('tbody tr');
-            rows.forEach((row, index) => {
-                row.style.opacity = '0';
-                row.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    row.style.transition = 'all 0.5s ease';
-                    row.style.opacity = '1';
-                    row.style.transform = 'translateY(0)';
-                }, index * 30);
-            });
-        });
-    </script>
-</body>
-</html>
+        // Create blob and download
+        const csvContent = csv.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'MedZen_Health_Team_Grant_Assignments.csv');
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification('Table downloaded successfully!', 'success');
+    }
+    
+    // Save team member name to localStorage
+    document.getElementById('teamMemberName').addEventListener('input', function() {
+        localStorage.setItem('teamMemberName', this.value);
+    });
+    
+    // Initialize on load
+    window.addEventListener('load', async () => {
+        console.log('Initializing application...');
+        
+        // Load data from Supabase
+        await loadFromSupabase();
+        
+        // Set up real-time updates
+        setupRealtimeUpdates();
+        
+        // Load saved name
+        const savedName = localStorage.getItem('teamMemberName');
+        if (savedName) {
+            document.getElementById('teamMemberName').value = savedName;
+        }
+        
+        // Render table
+        renderTable();
+        
+        // Show success message
+        if (fundingData.length > 0) {
+            showNotification(`🌐 Connected! Loaded ${fundingData.length} grants from database`, 'success');
+        } else {
+            showNotification('Database is empty. Run the SQL script first!', 'error');
+        }
+    });
+</script>
